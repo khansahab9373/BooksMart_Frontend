@@ -1,3 +1,3 @@
-let BaseULR = "http://localhost:3000/";
+let BaseULR = "https://bookshell-backend.vercel.app/";
 
 export default BaseULR;
