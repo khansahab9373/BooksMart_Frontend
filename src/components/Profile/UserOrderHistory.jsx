@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import { Link } from "react-router-dom";
+import BaseULR from "../../assets/baseURL";
 
 const UserOrderHistory = () => {
   const [OrderHistory, setOrderHistory] = useState(null);
@@ -14,7 +15,7 @@ const UserOrderHistory = () => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          "https://bookshell-backend.vercel.app/api/v1/get-order-history",
+          `${BaseULR}api/v1/get-order-history`,
           { headers }
         );
         setOrderHistory(response.data.data);

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import BaseULR from "../../assets/baseURL";
 
 const BookCard = ({ data, favourite, onRemove }) => {
   const [loading, setLoading] = useState(false);
@@ -16,7 +17,7 @@ const BookCard = ({ data, favourite, onRemove }) => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `https://bookshell-backend.vercel.app/api/v1/remove-book-from-favourite`,
+        `${BaseULR}api/v1/remove-book-from-favourite`,
         {}, // Empty body as headers contain data
         { headers }
       );

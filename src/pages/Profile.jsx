@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import axios from "axios";
 import Loader from "../components/Loader/Loader";
 import MobileNav from "../components/Profile/MobileNav";
+import BaseULR from "../assets/baseURL";
 
 const Profile = () => {
   const [Profile, setProfile] = useState(null);
@@ -16,7 +17,7 @@ const Profile = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://bookshell-backend.vercel.app/api/v1/get-user-information",
+          `${BaseULR}api/v1/get-user-information`,
           { headers }
         );
         setProfile(response.data);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BookCard from "../BookCard/BookCard";
 import Loader from "../Loader/Loader";
+import BaseULR from "../../assets/baseURL";
 
 const RecentlyAdded = () => {
   const [Data, setData] = useState();
@@ -9,7 +10,7 @@ const RecentlyAdded = () => {
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
-        "https://bookshell-backend.vercel.app/api/v1/get-recent-books"
+        `${BaseULR}api/v1/get-recent-books`
       );
       setData(response.data.data);
     };

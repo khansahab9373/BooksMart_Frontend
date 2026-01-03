@@ -6,6 +6,7 @@ import { FaUser, FaCheck } from "react-icons/fa";
 import { IoOpenOutline } from "react-icons/io5";
 import Swal from "sweetalert2"; // Import SweetAlert2
 import SeeUserData from "./SeeUserData";
+import BaseULR from "../assets/baseURL";
 
 const AllOrders = () => {
   const [AllOrders, setAllOrders] = useState([]);
@@ -22,10 +23,9 @@ const AllOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get(
-          "https://bookshell-backend.vercel.app/api/v1/get-all-orders",
-          { headers }
-        );
+        const response = await axios.get(`${BaseULR}api/v1/get-all-orders`, {
+          headers,
+        });
         const orders = response.data.data || [];
         setAllOrders(orders); // Directly set all orders without modifying the array
       } catch (error) {
@@ -52,7 +52,7 @@ const AllOrders = () => {
     const id = AllOrders[index]._id;
     try {
       const response = await axios.put(
-        `https://bookshell-backend.vercel.app/api/v1/update-status/${id}`,
+        `${BaseULR}api/v1/update-status/${id}`,
         Values,
         { headers }
       );

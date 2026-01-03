@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Loader from "../components/Loader/Loader";
 import BookCard from "../components/BookCard/BookCard";
+import BaseULR from "../assets/baseURL";
 
 const AllBooks = () => {
   const [Data, setData] = useState();
   useEffect(() => {
     const fetch = async () => {
-      const response = await axios.get(
-        "https://bookshell-backend.vercel.app/api/v1/get-all-books"
-      );
+      const response = await axios.get(`${BaseULR}api/v1/get-all-books`);
       setData(response.data.data);
     };
     fetch();

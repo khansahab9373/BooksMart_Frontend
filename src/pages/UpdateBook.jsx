@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import BaseULR from "../assets/baseURL";
 
 const UpdateBook = () => {
   const [Data, setData] = useState({
@@ -47,11 +48,9 @@ const UpdateBook = () => {
         });
         return;
       } else {
-        const response = await axios.put(
-          `https://bookshell-backend.vercel.app/api/v1/update-book`,
-          Data,
-          { headers }
-        );
+        const response = await axios.put(`${BaseULR}api/v1/update-book`, Data, {
+          headers,
+        });
         setData({
           url: "",
           title: "",
@@ -88,7 +87,7 @@ const UpdateBook = () => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          `https://bookshell-backend.vercel.app/api/v1/get-book-by-id/${id}`
+          `${BaseULR}api/v1/get-book-by-id/${id}`
         );
         setData(response.data.data);
       } catch (error) {

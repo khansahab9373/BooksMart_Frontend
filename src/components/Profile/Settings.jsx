@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import BaseULR from "../../assets/baseURL";
 
 const Settings = () => {
   const [profileData, setProfileData] = useState(null);
@@ -18,7 +19,7 @@ const Settings = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          "https://bookshell-backend.vercel.app/api/v1/get-user-information",
+          `${BaseULR}api/v1/get-user-information`,
           { headers }
         );
         setProfileData(response.data);
@@ -47,7 +48,7 @@ const Settings = () => {
     setIsSubmitting(true); // Show loading state
     try {
       const response = await axios.put(
-        "https://bookshell-backend.vercel.app/api/v1/update-address",
+        `${BaseULR}api/v1/update-address`,
         value,
         { headers }
       );

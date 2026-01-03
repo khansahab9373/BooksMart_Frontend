@@ -49,7 +49,7 @@ const Navbar = () => {
             src="https://cdn-icons-png.flaticon.com/128/10433/10433049.png"
             alt="logo"
           />
-          <h1 className="text-2xl font-semibold">BooksHell</h1>
+          <h1 className="text-2xl font-semibold">BooksMart</h1>
         </Link>
         <div className="nav-links-bookheaven block md:flex items-center gap-4">
           <div className="hidden md:flex gap-4">
@@ -84,15 +84,20 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Add ThemeToggle Component */}
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
 
-          <button
-            onClick={toggleMobileNav}
-            className="block md:hidden text-black dark:text-white text-2xl hover:text-zinc-400"
-          >
-            <FaGripLines />
-          </button>
+            <button
+              onClick={toggleMobileNav}
+              className="block md:hidden flex items-center justify-center
+               w-10 h-10 rounded
+               text-black dark:text-white
+               hover:bg-gray-200 dark:hover:bg-zinc-700
+               transition"
+            >
+              <FaGripLines size={22} />
+            </button>
+          </div>
         </div>
       </nav>
 

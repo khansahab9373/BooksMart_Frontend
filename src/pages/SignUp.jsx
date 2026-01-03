@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import BaseULR from "../assets/baseURL";
 
 const SignUp = () => {
   const [Values, setValues] = useState({
@@ -34,10 +35,7 @@ const SignUp = () => {
         });
         return;
       } else {
-        const response = await axios.post(
-          "https://bookshell-backend.vercel.app/api/v1/sign-up",
-          Values
-        );
+        const response = await axios.post(`${BaseULR}api/v1/sign-up`, Values);
 
         // SweetAlert for success
         Swal.fire({

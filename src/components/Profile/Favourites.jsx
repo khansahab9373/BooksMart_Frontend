@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BookCard from "../BookCard/BookCard";
+import BaseULR from "../../assets/baseURL";
 
 const Favourites = () => {
   const [FavouriteBooks, setFavouriteBooks] = useState([]);
@@ -14,7 +15,7 @@ const Favourites = () => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          `https://bookshell-backend.vercel.app/api/v1/get-favourite-books`,
+          `${BaseULR}api/v1/get-favourite-books`,
           { headers }
         );
         setFavouriteBooks(response.data.data || []);
@@ -46,7 +47,7 @@ const Favourites = () => {
               <BookCard
                 data={item}
                 favourite={true}
-                onRemove={handleRemoveBook}  // Pass the onRemove function
+                onRemove={handleRemoveBook} // Pass the onRemove function
               />
             </div>
           ))}

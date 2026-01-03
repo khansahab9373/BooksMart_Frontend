@@ -4,6 +4,7 @@ import Loader from "../components/Loader/Loader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import BaseULR from "../assets/baseURL";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -20,10 +21,9 @@ const Cart = () => {
   const fetchCart = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `https://bookshell-backend.vercel.app/api/v1/get-user-cart`,
-        { headers }
-      );
+      const res = await axios.get(`${BaseULR}api/v1/get-user-cart`, {
+        headers,
+      });
       setCart(res.data.data || []);
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -69,7 +69,7 @@ const Cart = () => {
       if (result.isConfirmed) {
         try {
           const response = await axios.put(
-            `https://bookshell-backend.vercel.app/api/v1/remove-from-cart/${bookid}`,
+            `${BaseULR}api/v1/remove-from-cart/${bookid}`,
             {},
             { headers }
           );
@@ -109,7 +109,7 @@ const Cart = () => {
       if (result.isConfirmed) {
         try {
           const response = await axios.post(
-            "https://bookshell-backend.vercel.app/api/v1/place-order",
+            `${BaseULR}api/v1/place-order`,
             { order: Cart },
             { headers }
           );
