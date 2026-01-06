@@ -48,8 +48,16 @@ const AllOrders = () => {
     setValues({ status: value });
   };
 
-  const submitChanges = async (index) => {
-    const id = AllOrders[index]._id;
+  const submitChanges = async (orderId) => {
+    const id = orderId;
+    if (!Values.status) {
+      Swal.fire(
+        "Select status",
+        "Please select a status before updating.",
+        "warning"
+      );
+      return;
+    }
     try {
       const response = await axios.put(
         `${BaseULR}api/v1/update-status/${id}`,
@@ -60,7 +68,13 @@ const AllOrders = () => {
       // SweetAlert for success
       Swal.fire("Updated", response.data.message, "success");
 
+      // Update local state so the change is reflected without a page refresh
+      setAllOrders((prev) =>
+        prev.map((o) => (o._id === id ? { ...o, status: Values.status } : o))
+      );
+
       setOptions(null); // Reset the option select after updating
+      setValues({ status: "" });
     } catch (error) {
       console.error("Error updating status:", error);
 
@@ -108,9 +122,9 @@ const AllOrders = () => {
             </div>
           </div>
 
-          {AllOrders.map((items, i) => (
+          {AllOrders.filter((it) => it && it.book).map((items, i) => (
             <div
-              key={items.book._id}
+              key={items._id}
               className="bg-gray-200 dark:bg-zinc-700 w-full rounded py-2 px-4 flex gap-2 hover:bg-gray-300 dark:hover:bg-zinc-600 hover:cursor-pointer transition-all duration-300"
             >
               <div className="w-[3%]">
@@ -140,19 +154,33 @@ const AllOrders = () => {
                 <h1 className="font-semibold">
                   <button
                     className="hover:scale-105 transition-all duration-300"
-                    onClick={() => setOptions(i)}
+                    onClick={() => {
+                      setOptions(items._id);
+                      setValues({ status: items.status });
+                    }}
                   >
-                    {items.status === "Order placed" ? (
-                      <div className="text-yellow-500">{items.status}</div>
-                    ) : items.status === "Canceled" ? (
-                      <div className="text-red-500">{items.status}</div>
-                    ) : (
-                      <div className="text-green-500">{items.status}</div>
-                    )}
+                    {(() => {
+                      const s = (items.status || "").toLowerCase();
+                      if (s.includes("placed"))
+                        return (
+                          <div className="text-yellow-500">{items.status}</div>
+                        );
+                      if (s.includes("cancel"))
+                        return (
+                          <div className="text-red-500">{items.status}</div>
+                        );
+                      return (
+                        <div className="text-green-500">{items.status}</div>
+                      );
+                    })()}
                   </button>
                 </h1>
 
-                <div className={`${Options === i ? "flex mt-2" : "hidden"}`}>
+                <div
+                  className={`${
+                    Options === items._id ? "flex mt-2" : "hidden"
+                  }`}
+                >
                   <select
                     name="status"
                     className="bg-gray-800 p-1 rounded text-white"
@@ -160,10 +188,10 @@ const AllOrders = () => {
                     value={Values.status}
                   >
                     {[
-                      "Order placed",
-                      "out for delivery",
-                      "delivered",
-                      "canceled",
+                      "Order Placed",
+                      "Out for delivery",
+                      "Delivered",
+                      "Cancelled",
                     ].map((statusOption, idx) => (
                       <option key={idx} value={statusOption}>
                         {statusOption}
@@ -172,7 +200,7 @@ const AllOrders = () => {
                   </select>
                   <button
                     className="text-green-500 hover:text-pink-600 mx-2"
-                    onClick={() => submitChanges(i)}
+                    onClick={() => submitChanges(items._id)}
                   >
                     <FaCheck />
                   </button>

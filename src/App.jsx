@@ -11,13 +11,14 @@ import Profile from "./pages/Profile";
 import ViewBookDetails from "./components/ViewBookDetails/ViewBookDetails";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "./store/auth";
+import axios from "axios";
+import BaseULR from "./assets/baseURL";
 import Favourites from "./components/Profile/Favourites";
 import UserOrderHistory from "./components/Profile/UserOrderHistory";
 import Settings from "./components/Profile/Settings";
 import AllOrders from "./pages/AllOrders";
 import AddBook from "./components/Profile/AddBook";
 import UpdateBook from "./pages/UpdateBook"; // Updated component import (camelCase)
-import ThemeToggle from "./components/ThemeToggle";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -31,6 +32,28 @@ const App = () => {
     ) {
       dispatch(authActions.login());
       dispatch(authActions.changeRole(localStorage.getItem("role")));
+      // fetch user info to populate avatar/username in store
+      (async () => {
+        try {
+          const res = await axios.get(`${BaseULR}api/v1/get-user-information`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              id: localStorage.getItem("id"),
+            },
+          });
+          const user = res.data;
+          dispatch(
+            authActions.setUser({
+              id: localStorage.getItem("id"),
+              token: localStorage.getItem("token"),
+              username: user.username,
+              avatar: user.avatar,
+            })
+          );
+        } catch (err) {
+          console.warn("Failed to load user info on app start", err);
+        }
+      })();
     }
   }, [dispatch]);
 

@@ -15,6 +15,8 @@ const Navbar = () => {
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const role = useSelector((state) => state.auth.role);
+  const avatar = useSelector((state) => state.auth.avatar);
+  const username = useSelector((state) => state.auth.username);
 
   // Filter links based on role and login status
   const links = baseLinks.filter((item) => {
@@ -53,19 +55,37 @@ const Navbar = () => {
         </Link>
         <div className="nav-links-bookheaven block md:flex items-center gap-4">
           <div className="hidden md:flex gap-4">
-            {links.map((item, i) => (
-              <Link
-                to={item.link}
-                className={`${
-                  item.title === "Profile" || item.title === "Admin Profile"
-                    ? "px-4 py-1 border border-blue-500 rounded hover:bg-gray-200 dark:hover:bg-zinc-900 hover:text-black dark:hover:text-white"
-                    : "hover:text-blue-500"
-                } transition duration-300`}
-                key={i}
-              >
-                {item.title}
-              </Link>
-            ))}
+            {links.map((item, i) => {
+              // Show avatar instead of 'Profile' when logged in
+              if (item.title === "Profile" && isLoggedIn) {
+                const imgSrc =
+                  avatar ||
+                  "https://cdn.iconscout.com/icon/free/png-512/free-avatar-icon-download-in-svg-png-gif-file-formats--telegram-logo-man-ui-pack-miscellaneous-icons-840229.png?f=webp&w=256";
+                return (
+                  <Link to={item.link} key={i} className="px-1">
+                    <img
+                      src={imgSrc}
+                      alt={username || "profile"}
+                      className="h-9 w-9 rounded-full object-cover border border-gray-200 dark:border-zinc-700"
+                    />
+                  </Link>
+                );
+              }
+
+              return (
+                <Link
+                  to={item.link}
+                  className={`${
+                    item.title === "Admin Profile"
+                      ? "px-4 py-1 border border-blue-500 rounded hover:bg-gray-200 dark:hover:bg-zinc-900 hover:text-black dark:hover:text-white"
+                      : "hover:text-blue-500"
+                  } transition duration-300`}
+                  key={i}
+                >
+                  {item.title}
+                </Link>
+              );
+            })}
           </div>
           {!isLoggedIn && (
             <div className="hidden md:flex gap-4">
@@ -107,16 +127,41 @@ const Navbar = () => {
           mobileNavVisible ? "block" : "hidden"
         } bg-gray-100 dark:bg-zinc-800 h-screen absolute top-0 left-0 w-full z-40 flex flex-col items-center justify-center`}
       >
-        {links.map((item, i) => (
-          <Link
-            to={item.link}
-            className="text-black dark:text-white text-4xl mb-8 font-semibold hover:text-blue-500 transition-all duration-300"
-            key={i}
-            onClick={toggleMobileNav} // Close mobile nav on link click
-          >
-            {item.title}
-          </Link>
-        ))}
+        {links.map((item, i) => {
+          if (item.title === "Profile" && isLoggedIn) {
+            const imgSrc =
+              avatar ||
+              "https://cdn.iconscout.com/icon/free/png-512/free-avatar-icon-download-in-svg-png-gif-file-formats--telegram-logo-man-ui-pack-miscellaneous-icons-840229.png?f=webp&w=256";
+            return (
+              <Link
+                to={item.link}
+                key={i}
+                onClick={toggleMobileNav}
+                className="mb-6"
+              >
+                <img
+                  src={imgSrc}
+                  alt={username || "profile"}
+                  className="h-28 w-28 rounded-full object-cover mx-auto"
+                />
+                <p className="text-center mt-2 text-2xl text-black dark:text-white">
+                  {username || "Profile"}
+                </p>
+              </Link>
+            );
+          }
+
+          return (
+            <Link
+              to={item.link}
+              className="text-black dark:text-white text-4xl mb-8 font-semibold hover:text-blue-500 transition-all duration-300"
+              key={i}
+              onClick={toggleMobileNav} // Close mobile nav on link click
+            >
+              {item.title}
+            </Link>
+          );
+        })}
 
         {!isLoggedIn && (
           <>

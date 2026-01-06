@@ -33,11 +33,43 @@ const Login = () => {
       } else {
         const response = await axios.post(`${BaseULR}api/v1/sign-in`, Values);
 
-        dispatch(authActions.login());
-        dispatch(authActions.changeRole(response.data.role));
+        // save tokens and basic info
         localStorage.setItem("id", response.data.id);
         localStorage.setItem("role", response.data.role);
         localStorage.setItem("token", response.data.token);
+        dispatch(authActions.changeRole(response.data.role));
+
+        // fetch full user info (to get avatar and username)
+        try {
+          const userRes = await axios.get(
+            `${BaseULR}api/v1/get-user-information`,
+            {
+              headers: {
+                Authorization: `Bearer ${response.data.token}`,
+                id: response.data.id,
+              },
+            }
+          );
+          const user = userRes.data;
+          dispatch(
+            authActions.setUser({
+              id: response.data.id,
+              token: response.data.token,
+              username: user.username,
+              avatar: user.avatar,
+            })
+          );
+        } catch (err) {
+          console.warn("Could not fetch user info after login:", err);
+          // still mark logged in
+          dispatch(authActions.login());
+          dispatch(
+            authActions.setUser({
+              id: response.data.id,
+              token: response.data.token,
+            })
+          );
+        }
 
         // SweetAlert for success
         Swal.fire({

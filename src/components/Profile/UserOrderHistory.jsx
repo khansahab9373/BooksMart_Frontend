@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import { Link } from "react-router-dom";
@@ -14,10 +14,9 @@ const UserOrderHistory = () => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const response = await axios.get(
-          `${BaseULR}api/v1/get-order-history`,
-          { headers }
-        );
+        const response = await axios.get(`${BaseULR}api/v1/get-order-history`, {
+          headers,
+        });
         setOrderHistory(response.data.data);
       } catch (error) {
         console.log("Error fetching order history:", error);
@@ -25,6 +24,10 @@ const UserOrderHistory = () => {
     };
     fetch();
   }, []);
+
+  const validOrders = OrderHistory
+    ? OrderHistory.filter((o) => o && o.book)
+    : [];
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white px-4 py-8">
@@ -34,7 +37,7 @@ const UserOrderHistory = () => {
         </div>
       )}
 
-      {OrderHistory && OrderHistory.length === 0 && (
+      {OrderHistory && validOrders.length === 0 && (
         <div className="h-[80vh] p-4 text-gray-800 dark:text-zinc-300">
           <div className="h-[100%] flex flex-col items-center justify-center">
             <h1 className="text-5xl font-semibold text-gray-500 dark:text-zinc-400 mb-8">
@@ -49,7 +52,7 @@ const UserOrderHistory = () => {
         </div>
       )}
 
-      {OrderHistory && OrderHistory.length > 0 && (
+      {OrderHistory && validOrders.length > 0 && (
         <div className="h-[100%] p-0 md:p-4">
           <h1 className="text-3xl md:text-5xl font-semibold text-gray-800 dark:text-yellow-100 mb-8">
             Your Order History
@@ -76,7 +79,7 @@ const UserOrderHistory = () => {
             </div>
           </div>
 
-          {OrderHistory.map((order, index) => (
+          {validOrders.map((order, index) => (
             <div
               key={order._id}
               className="mt-4 bg-gray-100 dark:bg-zinc-800 w-full rounded py-2 px-4 flex gap-2 items-center hover:bg-gray-300 dark:hover:bg-zinc-600 transition-all duration-300"
@@ -106,13 +109,16 @@ const UserOrderHistory = () => {
               </div>
               <div className="w-[16%]">
                 <h1 className="font-semibold">
-                  {order.status === "Order placed" ? (
-                    <div className="text-yellow-500">{order.status}</div>
-                  ) : order.status === "Canceled" ? (
-                    <div className="text-red-500">{order.status}</div>
-                  ) : (
-                    <div className="text-green-500">{order.status}</div>
-                  )}
+                  {(() => {
+                    const s = (order.status || "").toLowerCase();
+                    if (s.includes("placed"))
+                      return (
+                        <div className="text-yellow-500">{order.status}</div>
+                      );
+                    if (s.includes("cancel"))
+                      return <div className="text-red-500">{order.status}</div>;
+                    return <div className="text-green-500">{order.status}</div>;
+                  })()}
                 </h1>
               </div>
               <div className="w-none md:w-[5%] hidden md:block">
