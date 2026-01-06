@@ -1,8 +1,8 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Loader from "../components/Loader/Loader";
-import { FaUser, FaCheck } from "react-icons/fa";
+
+import {  FaCheck } from "react-icons/fa";
 import { IoOpenOutline } from "react-icons/io5";
 import Swal from "sweetalert2"; // Import SweetAlert2
 import SeeUserData from "./SeeUserData";
