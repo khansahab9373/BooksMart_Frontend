@@ -4,6 +4,8 @@ import axios from "axios";
 import { authActions } from "../store/auth";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
 import BaseULR from "../assets/baseURL";
 
 const Login = () => {
@@ -11,6 +13,7 @@ const Login = () => {
     username: "",
     password: "",
   });
+  const [formErrors, setFormErrors] = useState({});
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -18,19 +21,21 @@ const Login = () => {
   const change = (e) => {
     const { name, value } = e.target;
     setValues({ ...Values, [name]: value });
+    setFormErrors({ ...formErrors, [name]: undefined });
   };
+
+  const [loading, setLoading] = useState(false);
 
   const submit = async () => {
     try {
-      if (Values.username === "" || Values.password === "") {
-        // SweetAlert for missing fields
-        Swal.fire({
-          icon: "warning",
-          title: "Missing Fields",
-          text: "All fields are required!",
-        });
+      const errors = {};
+      if (!Values.username) errors.username = "Username is required.";
+      if (!Values.password) errors.password = "Password is required.";
+      if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
         return;
       } else {
+        setLoading(true);
         const response = await axios.post(`${BaseULR}api/v1/sign-in`, Values);
 
         // save tokens and basic info
@@ -113,12 +118,14 @@ const Login = () => {
           text: "An unexpected error occurred. Please try again.",
         });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white px-12 py-8 flex items-center justify-center">
-      <div className="bg-gray-100 dark:bg-zinc-800 rounded-lg px-8 py-5 w-full md:w-3/6 lg:w-2/6">
+      <Card className="w-full md:w-3/6 lg:w-2/6 px-8 py-5">
         <p className="text-gray-800 dark:text-zinc-200 text-xl">Log In</p>
         <div className="mt-4">
           <div>
@@ -129,14 +136,27 @@ const Login = () => {
               Username
             </label>
             <input
+              id="login-username"
               type="text"
-              className="w-full mt-2 bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none"
+              className="w-full mt-2 bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-3 rounded"
               placeholder="username"
               name="username"
               required
               value={Values.username}
               onChange={change}
+              aria-invalid={!!formErrors.username}
+              aria-describedby={
+                formErrors.username ? "login-username-error" : undefined
+              }
             />
+            {formErrors.username && (
+              <p
+                id="login-username-error"
+                className="text-sm text-red-600 mt-1"
+              >
+                {formErrors.username}
+              </p>
+            )}
           </div>
           <div className="mt-4">
             <label
@@ -146,22 +166,37 @@ const Login = () => {
               Password
             </label>
             <input
+              id="login-password"
               type="password"
-              className="w-full mt-2 bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none"
+              className="w-full mt-2 bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-3 rounded"
               placeholder="password"
               name="password"
               required
               value={Values.password}
               onChange={change}
+              aria-invalid={!!formErrors.password}
+              aria-describedby={
+                formErrors.password ? "login-password-error" : undefined
+              }
             />
+            {formErrors.password && (
+              <p
+                id="login-password-error"
+                className="text-sm text-red-600 mt-1"
+              >
+                {formErrors.password}
+              </p>
+            )}
           </div>
           <div className="mt-4">
-            <button
-              className="w-full bg-blue-500 text-white font-semibold py-2 rounded hover:text-black"
+            <Button
+              className="w-full font-semibold"
               onClick={submit}
+              loading={loading}
+              disabled={loading}
             >
               LogIn
-            </button>
+            </Button>
           </div>
           <p className="flex mt-4 items-center justify-center text-gray-800 dark:text-zinc-200 font-semibold">
             Or
@@ -173,7 +208,7 @@ const Login = () => {
             </Link>
           </p>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

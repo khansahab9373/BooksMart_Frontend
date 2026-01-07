@@ -117,29 +117,31 @@ const ViewBookDetails = () => {
 
   return (
     <>
-      <div className="px-4 md:px-12 py-8 bg-white dark:bg-gray-900 flex flex-col lg:flex-row gap-8 items-start">
+      <div className="px-4 sm:px-6 md:px-12 py-6 bg-white dark:bg-gray-900 flex flex-col lg:flex-row gap-6 items-start overflow-hidden">
         <div className="w-full lg:w-3/6">
           <div className="flex flex-col lg:flex-row justify-around bg-gray-100 dark:bg-zinc-800 p-12 rounded">
             <img
               src={Data.url}
-              alt=""
-              className="h-[70vh] md:h-[60vh] lg:h-[70vh] rounded"
+              alt={`${Data.title} cover`}
+              className="h-auto md:h-[60vh] lg:h-[70vh] rounded"
             />
 
             {isLoggedIn === true && role === "user" && (
               <div className="flex flex-col md:flex-row lg:flex-col items-center justify-between lg:justify-start mt-4 lg:mt-0">
                 <button
-                  className="text-white rounded lg:rounded-full text-3xl p-3 bg-red-500 flex items-center justify-center"
+                  className="text-white rounded lg:rounded-full text-3xl p-3 bg-red-500 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
                   onClick={handleFavourite}
+                  aria-label="Add to favourites"
                 >
-                  <FaHeart />
+                  <FaHeart aria-hidden="true" />
                   <span className="ms-4 block lg:hidden">Favourites</span>
                 </button>
                 <button
-                  className="text-white rounded mt-8 md:mt-0 lg:rounded-full text-3xl p-3 lg:mt-8 bg-blue-500 flex items-center justify-center"
+                  className="text-white rounded mt-8 md:mt-0 lg:rounded-full text-3xl p-3 lg:mt-8 bg-blue-500 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
                   onClick={handleCart}
+                  aria-label="Add to cart"
                 >
-                  <FaShoppingCart />
+                  <FaShoppingCart aria-hidden="true" />
                   <span className="ms-4 block lg:hidden">Add to cart</span>
                 </button>
               </div>
@@ -149,16 +151,18 @@ const ViewBookDetails = () => {
               <div className="flex flex-col md:flex-row lg:flex-col items-center justify-between lg:justify-start mt-4 lg:mt-0">
                 <Link
                   to={`/updateBook/${id}`}
-                  className="text-black dark:text-white rounded lg:rounded-full text-3xl p-3 bg-white dark:bg-gray-700 flex items-center justify-center"
+                  className="text-black dark:text-white rounded lg:rounded-full text-3xl p-3 bg-white dark:bg-gray-700 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
+                  aria-label="Edit book"
                 >
-                  <FaEdit />
+                  <FaEdit aria-hidden="true" />
                   <span className="ms-4 block lg:hidden">Edit</span>
                 </Link>
                 <button
-                  className="text-red-600 rounded mt-8 md:mt-0 lg:rounded-full text-3xl p-3 lg:mt-8 bg-white dark:bg-gray-700 flex items-center justify-center"
+                  className="text-red-600 rounded mt-8 md:mt-0 lg:rounded-full text-3xl p-3 lg:mt-8 bg-white dark:bg-gray-700 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
                   onClick={deleteBook}
+                  aria-label="Delete book"
                 >
-                  <MdDeleteOutline />
+                  <MdDeleteOutline aria-hidden="true" />
                   <span className="ms-4 block lg:hidden">Delete Book</span>
                 </button>
               </div>

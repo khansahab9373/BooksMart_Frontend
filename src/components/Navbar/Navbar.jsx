@@ -44,7 +44,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="z-50 relative flex bg-gray-100 dark:bg-zinc-800 text-black dark:text-white px-8 py-4 items-center justify-between">
+      <nav className="z-50 relative flex bg-gray-100 dark:bg-zinc-800 text-black dark:text-white px-4 sm:px-8 py-4 items-center justify-between">
         <Link to="/" className="flex items-center">
           <img
             className="h-10 me-4"
@@ -109,13 +109,15 @@ const Navbar = () => {
 
             <button
               onClick={toggleMobileNav}
+              aria-expanded={mobileNavVisible}
+              aria-controls="mobile-nav"
               className="block md:hidden flex items-center justify-center
                w-10 h-10 rounded
                text-black dark:text-white
                hover:bg-gray-200 dark:hover:bg-zinc-700
-               transition"
+               transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
             >
-              <FaGripLines size={22} />
+              <FaGripLines size={22} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -123,9 +125,10 @@ const Navbar = () => {
 
       {/* Mobile Nav */}
       <div
+        id="mobile-nav"
         className={`${
           mobileNavVisible ? "block" : "hidden"
-        } bg-gray-100 dark:bg-zinc-800 h-screen absolute top-0 left-0 w-full z-40 flex flex-col items-center justify-center`}
+        } bg-gray-100 dark:bg-zinc-800 absolute inset-0 z-40 flex flex-col items-center justify-center overflow-auto p-6`}
       >
         {links.map((item, i) => {
           if (item.title === "Profile" && isLoggedIn) {
@@ -142,9 +145,9 @@ const Navbar = () => {
                 <img
                   src={imgSrc}
                   alt={username || "profile"}
-                  className="h-28 w-28 rounded-full object-cover mx-auto"
+                  className="h-20 w-20 sm:h-28 sm:w-28 rounded-full object-cover mx-auto"
                 />
-                <p className="text-center mt-2 text-2xl text-black dark:text-white">
+                <p className="text-center mt-2 text-xl sm:text-2xl text-black dark:text-white">
                   {username || "Profile"}
                 </p>
               </Link>

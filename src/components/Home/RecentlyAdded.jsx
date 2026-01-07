@@ -9,9 +9,7 @@ const RecentlyAdded = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await axios.get(
-        `${BaseULR}api/v1/get-recent-books`
-      );
+      const response = await axios.get(`${BaseULR}api/v1/get-recent-books`);
       setData(response.data.data);
     };
     fetch();
@@ -27,10 +25,10 @@ const RecentlyAdded = () => {
           <Loader />
         </div>
       )}
-      <div className="my-8 grid grid-cols-1 sd:grid-cols-3 md:grid-cols-4 gap-8">
+      <div className="my-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {Data &&
           Data.map((items, i) => (
-            <div key={i}>
+            <div key={i} className="h-full">
               <BookCard data={items} />
             </div>
           ))}

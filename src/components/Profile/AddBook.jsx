@@ -42,11 +42,9 @@ const AddBook = () => {
           text: "All fields are required!",
         });
       } else {
-        const response = await axios.post(
-          `${BaseULR}api/v1/add-book`,
-          Data,
-          { headers }
-        );
+        const response = await axios.post(`${BaseULR}api/v1/add-book`, Data, {
+          headers,
+        });
         setData({
           url: "",
           title: "",
@@ -90,6 +88,7 @@ const AddBook = () => {
             Image URL
           </label>
           <input
+            id="url"
             type="text"
             className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
             placeholder="Enter Image URL"
@@ -108,6 +107,7 @@ const AddBook = () => {
             Title
           </label>
           <input
+            id="title"
             type="text"
             className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
             placeholder="Enter Book Title"
@@ -126,6 +126,7 @@ const AddBook = () => {
             Author
           </label>
           <input
+            id="author"
             type="text"
             className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
             placeholder="Enter Author Name"
@@ -145,6 +146,7 @@ const AddBook = () => {
               Language
             </label>
             <input
+              id="language"
               type="text"
               className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
               placeholder="Enter Language"
@@ -162,6 +164,7 @@ const AddBook = () => {
               Price
             </label>
             <input
+              id="price"
               type="number"
               className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
               placeholder="Enter Price"
@@ -181,6 +184,7 @@ const AddBook = () => {
             Description
           </label>
           <textarea
+            id="desc"
             className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
             rows="5"
             placeholder="Enter Description"

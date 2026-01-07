@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { AiFillDelete } from "react-icons/ai";
 import Loader from "../components/Loader/Loader";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2"; // Import SweetAlert2
@@ -11,6 +13,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
   const [Cart, setCart] = useState([]);
   const [Total, setTotal] = useState(0);
+  const [error, setError] = useState(null);
 
   const headers = {
     id: localStorage.getItem("id"),
@@ -20,15 +23,15 @@ const Cart = () => {
   // Fetch cart data
   const fetchCart = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await axios.get(`${BaseULR}api/v1/get-user-cart`, {
         headers,
       });
       setCart(res.data.data || []);
-    } catch (error) {
-      console.error("Error fetching cart:", error);
-
-      // SweetAlert for error
+    } catch (err) {
+      console.error("Error fetching cart:", err);
+      setError("Failed to fetch cart. Please try again.");
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -135,21 +138,44 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white px-12 py-8">
       {loading && (
-        <div className="w-full h-screen flex items-center justify-center">
+        <div className="w-full h-64 flex items-center justify-center">
           <Loader />
         </div>
       )}
-      {!loading && Cart.length === 0 && (
+
+      {!loading && error && (
+        <div className="w-full h-64 flex items-center justify-center">
+          <div className="w-full max-w-md">
+            <Card className="text-center">
+              <div className="text-3xl mb-2">⚠️</div>
+              <p className="text-lg text-gray-700 dark:text-zinc-200 mb-3">
+                {error}
+              </p>
+              <div className="flex justify-center">
+                <Button onClick={fetchCart}>Retry</Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && Cart.length === 0 && (
         <div className="h-screen">
           <div className="h-[100%] flex items-center justify-center flex-col">
-            <h1 className="text-5xl lg:text-6xl font-semibold text-gray-800 dark:text-zinc-400">
-              Empty Cart
-            </h1>
-            <img
-              src="/empty-cart.png"
-              alt="empty cart"
-              className="lg:h-[50vh]"
-            />
+            <Card className="p-12 text-center">
+              <div className="text-5xl mb-3">🛒</div>
+              <h1 className="text-2xl lg:text-3xl font-semibold text-gray-800 dark:text-zinc-400">
+                Your cart is empty
+              </h1>
+              <p className="text-gray-600 dark:text-zinc-300 mt-2">
+                Add books to your cart to get started.
+              </p>
+              <div className="mt-4">
+                <Button onClick={() => (window.location.href = "/all-books")}>
+                  Browse Books
+                </Button>
+              </div>
+            </Card>
           </div>
         </div>
       )}
@@ -165,7 +191,7 @@ const Cart = () => {
             >
               <img
                 src={items.url}
-                alt="/"
+                alt={`${items.title} cover`}
                 className="h-[20vh] md:h-[10vh] object-cover"
               />
               <div className="w-full md:w-auto">
@@ -187,10 +213,11 @@ const Cart = () => {
                   ₹{items.price}
                 </h2>
                 <button
-                  className="bg-red-100 text-red-700 border border-red-700 rounded p-2 ml-12"
+                  className="bg-red-100 text-red-700 border border-red-700 rounded p-2 ml-12 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
                   onClick={() => deleteItem(items._id)}
+                  aria-label={`Remove ${items.title} from cart`}
                 >
-                  <AiFillDelete />
+                  <AiFillDelete aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -208,12 +235,13 @@ const Cart = () => {
               <h2>₹{Total}</h2>
             </div>
             <div className="w-[100%] mt-3">
-              <button
+              <Button
                 className="bg-gray-800 dark:bg-zinc-100 text-white dark:text-black rounded px-4 py-2 flex justify-center w-full font-semibold hover:bg-gray-900 dark:hover:bg-zinc-900"
                 onClick={PlaceOrder}
+                aria-label="Place your order"
               >
                 Place your order
-              </button>
+              </Button>
             </div>
           </div>
         </div>

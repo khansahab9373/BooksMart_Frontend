@@ -39,8 +39,12 @@ const Profile = () => {
       {Profile && (
         <>
           <div className="w-full md:w-1/6 h-auto lg:h-screen">
-            <Sidebar_temp data={Profile} />
-            <MobileNav />
+            <div className="hidden md:block">
+              <Sidebar_temp data={Profile} />
+            </div>
+            <div className="block md:hidden">
+              <MobileNav />
+            </div>
           </div>
           <div className="w-full md:w-5/6">
             <Outlet />

@@ -6,18 +6,23 @@ import Swal from "sweetalert2"; // Import SweetAlert2
 import BaseULR from "../../assets/baseURL";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store/auth";
+import Card from "../ui/Card";
+import Button from "../ui/Button";
 
 const Settings = () => {
   const [profileData, setProfileData] = useState(null);
   const [value, setValue] = useState({ address: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
+  const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const dispatch = useDispatch();
   const [showCropModal, setShowCropModal] = useState(false);
   const [tempImageUrl, setTempImageUrl] = useState(null);
   const [tempFile, setTempFile] = useState(null);
   const [croppedPreviewUrl, setCroppedPreviewUrl] = useState(null);
   const imgRef = useRef(null);
+  const modalCancelRef = useRef(null);
   // react-easy-crop states
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -33,16 +38,16 @@ const Settings = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        setError(null);
         const response = await axios.get(
           `${BaseULR}api/v1/get-user-information`,
           { headers }
         );
         setProfileData(response.data);
         setValue({ address: response.data.address });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-
-        // SweetAlert for error
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Failed to fetch user data. Please try again.");
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -60,6 +65,13 @@ const Settings = () => {
 
   // Submit updated address
   const submitAddress = async () => {
+    const errs = {};
+    if (!value.address || value.address.trim() === "") {
+      errs.address = "Address cannot be empty.";
+      setFieldErrors(errs);
+      return;
+    }
+    setFieldErrors({});
     setIsSubmitting(true); // Show loading state
     try {
       const response = await axios.put(
@@ -73,8 +85,7 @@ const Settings = () => {
       Swal.fire("Updated", "Address updated successfully!", "success");
     } catch (error) {
       console.error("Error updating address:", error);
-
-      // SweetAlert for error
+      console.error("Error updating address:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -94,6 +105,10 @@ const Settings = () => {
     setTempImageUrl(url);
     setShowCropModal(true);
   };
+
+  React.useEffect(() => {
+    if (showCropModal && modalCancelRef.current) modalCancelRef.current.focus();
+  }, [showCropModal]);
 
   const onCropComplete = useCallback((_, croppedPixels) => {
     setCroppedAreaPixels(croppedPixels);
@@ -137,9 +152,13 @@ const Settings = () => {
     if (!tempImageUrl || !croppedAreaPixels) return;
     try {
       const blob = await getCroppedImg(tempImageUrl, croppedAreaPixels);
-      const croppedFile = new File([blob], tempFile.name || "avatar.jpg", {
-        type: blob.type,
-      });
+      const croppedFile = new File(
+        [blob],
+        tempFile.name || "Profile Picture.jpg",
+        {
+          type: blob.type,
+        }
+      );
 
       if (croppedPreviewUrl) URL.revokeObjectURL(croppedPreviewUrl);
       const preview = URL.createObjectURL(croppedFile);
@@ -202,13 +221,13 @@ const Settings = () => {
         URL.revokeObjectURL(croppedPreviewUrl);
         setCroppedPreviewUrl(null);
       }
-      Swal.fire("Updated", "Avatar updated successfully!", "success");
+      Swal.fire("Updated", "Profile Picture updated successfully!", "success");
     } catch (error) {
-      console.error("Error updating avatar:", error);
+      console.error("Error updating Profile Picture:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to update avatar.",
+        text: "Failed to update Profile Picture.",
       });
     } finally {
       setIsSubmitting(false);
@@ -217,9 +236,25 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white px-4 py-8">
-      {!profileData && (
+      {!profileData && !error && (
         <div className="w-full h-[100%] flex items-center justify-center">
           <Loader />
+        </div>
+      )}
+
+      {!profileData && error && (
+        <div className="w-full h-[100%] flex items-center justify-center">
+          <div className="w-full max-w-md">
+            <Card className="text-center">
+              <div className="text-3xl mb-2">⚠️</div>
+              <p className="text-lg text-gray-700 dark:text-zinc-200 mb-3">
+                {error}
+              </p>
+              <div className="flex justify-center">
+                <Button onClick={() => window.location.reload()}>Retry</Button>
+              </div>
+            </Card>
+          </div>
         </div>
       )}
 
@@ -228,8 +263,8 @@ const Settings = () => {
           <h1 className="text-3xl md:text-5xl font-semibold text-gray-800 dark:text-yellow-100 mb-8">
             Settings
           </h1>
-          <div className="flex gap-12">
-            <div>
+          <div className="flex flex-col md:flex-row gap-6 md:gap-12">
+            <div className="w-full md:w-auto">
               <label
                 htmlFor="username"
                 className="text-gray-600 dark:text-zinc-400"
@@ -240,7 +275,7 @@ const Settings = () => {
                 {profileData.username}
               </p>
             </div>
-            <div>
+            <div className="w-full md:w-auto">
               <label
                 htmlFor="email"
                 className="text-gray-600 dark:text-zinc-400"
@@ -251,26 +286,31 @@ const Settings = () => {
                 {profileData.email}
               </p>
             </div>
-            <div className="flex flex-col items-center">
-              <label className="text-gray-600 dark:text-zinc-400">Avatar</label>
+            <div className="flex flex-col items-center w-full md:w-auto">
+              <label className="text-gray-600 dark:text-zinc-400">
+                Profile Picture
+              </label>
               <img
                 src={croppedPreviewUrl || profileData.avatar}
-                alt="avatar"
-                className="h-28 w-28 rounded-full object-cover mt-2 border border-gray-200 dark:border-zinc-700"
+                alt="Profile Picture"
+                className="h-24 w-24 sm:h-28 sm:w-28 rounded-full object-cover mt-2 border border-gray-200 dark:border-zinc-700"
               />
               <input
+                id="settings-avatar"
                 type="file"
                 accept="image/*"
                 onChange={fileChange}
                 className="mt-3 text-sm text-gray-600 dark:text-zinc-300"
+                aria-label="Choose profile picture"
               />
-              <div className="flex gap-2 mt-2">
+              <div className="flex flex-col sm:flex-row gap-2 mt-2 w-full">
                 <button
                   onClick={submitAvatar}
                   disabled={isSubmitting}
-                  className="bg-blue-600 text-white px-3 py-1 rounded disabled:opacity-60"
+                  className="bg-blue-600 text-white px-3 py-2 rounded disabled:opacity-60 w-full sm:w-auto text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
+                  aria-label="Update profile picture"
                 >
-                  {isSubmitting ? "Updating..." : "Update Avatar"}
+                  {isSubmitting ? "Updating..." : "Update Profile Picture"}
                 </button>
                 <button
                   onClick={() => {
@@ -278,7 +318,8 @@ const Settings = () => {
                     setTempImageUrl(profileData.avatar);
                     setShowCropModal(true);
                   }}
-                  className="bg-gray-200 dark:bg-zinc-700 text-black dark:text-white px-3 py-1 rounded"
+                  className="bg-gray-200 dark:bg-zinc-700 text-black dark:text-white px-3 py-2 rounded w-full sm:w-auto text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
+                  aria-label="Crop existing profile picture"
                 >
                   Crop Existing
                 </button>
@@ -293,35 +334,60 @@ const Settings = () => {
               Address
             </label>
             <textarea
-              className="p-2 rounded bg-gray-200 dark:bg-zinc-800 mt-2 font-semibold text-black dark:text-zinc-100"
+              id="settings-address"
+              className="p-3 rounded bg-gray-200 dark:bg-zinc-800 mt-2 font-semibold text-black dark:text-zinc-100 w-full"
               rows="5"
               placeholder="Address"
               name="address"
               value={value.address}
               onChange={handleAddressChange}
+              aria-invalid={!!fieldErrors.address}
+              aria-describedby={
+                fieldErrors.address ? "settings-address-error" : undefined
+              }
             />
+            {fieldErrors.address && (
+              <p
+                id="settings-address-error"
+                className="text-sm text-red-600 mt-2"
+              >
+                {fieldErrors.address}
+              </p>
+            )}
           </div>
           <div className="mt-4 flex justify-end">
-            <button
-              className="bg-yellow-500 text-black dark:text-zinc-900 font-semibold px-3 py-2 rounded hover:bg-yellow-400"
+            <Button
               onClick={submitAddress}
+              loading={isSubmitting}
               disabled={isSubmitting}
+              className="w-full md:w-auto"
             >
               {isSubmitting ? "Updating..." : "Update"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
       {/* Crop Modal */}
       {showCropModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 w-[90%] max-w-2xl">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-zinc-200 mb-2">
-              Crop Avatar
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="settings-cropper-title"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") cancelCrop();
+          }}
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+        >
+          <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 w-full max-w-2xl max-h-[90vh] overflow-auto">
+            <h3
+              id="settings-cropper-title"
+              className="text-lg font-semibold text-gray-800 dark:text-zinc-200 mb-2"
+            >
+              Crop Profile Picture
             </h3>
-            <div className="flex gap-4">
-              <div className="flex-1 h-96 relative bg-gray-100 dark:bg-zinc-900">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 h-auto sm:h-96 relative bg-gray-100 dark:bg-zinc-900">
                 {tempImageUrl ? (
                   <Cropper
                     image={tempImageUrl}
@@ -338,7 +404,7 @@ const Settings = () => {
                   </div>
                 )}
               </div>
-              <div className="w-48 flex flex-col">
+              <div className="w-full sm:w-48 flex flex-col">
                 <label className="text-sm text-gray-600 dark:text-zinc-300">
                   Zoom
                 </label>
@@ -359,13 +425,16 @@ const Settings = () => {
                 <div className="mt-4 flex flex-col gap-2">
                   <button
                     onClick={applyCrop}
-                    className="bg-blue-600 text-white px-3 py-2 rounded"
+                    className="bg-blue-600 text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
+                    aria-label="Apply crop"
                   >
                     Apply Crop
                   </button>
                   <button
+                    ref={modalCancelRef}
                     onClick={cancelCrop}
-                    className="bg-gray-200 dark:bg-zinc-700 px-3 py-2 rounded"
+                    className="bg-gray-200 dark:bg-zinc-700 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
+                    aria-label="Cancel crop"
                   >
                     Cancel
                   </button>

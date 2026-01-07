@@ -120,6 +120,7 @@ const UpdateBook = () => {
             Image URL
           </label>
           <input
+            id="url"
             type="text"
             className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
             placeholder="Enter Image URL"
@@ -138,6 +139,7 @@ const UpdateBook = () => {
             Title
           </label>
           <input
+            id="title"
             type="text"
             className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
             placeholder="Enter Book Title"
@@ -156,6 +158,7 @@ const UpdateBook = () => {
             Author
           </label>
           <input
+            id="author"
             type="text"
             className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
             placeholder="Enter Author Name"
@@ -175,6 +178,7 @@ const UpdateBook = () => {
               Language
             </label>
             <input
+              id="language"
               type="text"
               className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
               placeholder="Enter Language"
@@ -192,6 +196,7 @@ const UpdateBook = () => {
               Price
             </label>
             <input
+              id="price"
               type="number"
               className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
               placeholder="Enter Price"
@@ -211,6 +216,7 @@ const UpdateBook = () => {
             Description
           </label>
           <textarea
+            id="desc"
             className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
             rows="5"
             placeholder="Enter Description"
