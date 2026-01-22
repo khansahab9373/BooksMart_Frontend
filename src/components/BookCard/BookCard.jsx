@@ -6,7 +6,7 @@ import BaseULR from "../../assets/baseURL";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 
-const BookCard = ({ data, favourite, onRemove }) => {
+const BookCard = ({ data, favourite, onRemove, highlightQuery = "" }) => {
   const [loading, setLoading] = useState(false);
 
   const headers = {
@@ -21,7 +21,7 @@ const BookCard = ({ data, favourite, onRemove }) => {
       const response = await axios.put(
         `${BaseULR}api/v1/remove-book-from-favourite`,
         {}, // Empty body as headers contain data
-        { headers }
+        { headers },
       );
       console.log("Book removed from favourites:", response.data.message);
 
@@ -50,6 +50,24 @@ const BookCard = ({ data, favourite, onRemove }) => {
     }
   };
 
+  const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const renderHighlighted = (text, query) => {
+    if (!query) return text;
+    const q = query.toString();
+    const parts = text.split(new RegExp(`(${escapeRegExp(q)})`, "i"));
+    return parts.map((part, i) => {
+      if (part.toLowerCase() === q.toLowerCase()) {
+        return (
+          <span key={i} className="bg-yellow-200 dark:bg-yellow-600 px-0.5">
+            {part}
+          </span>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
+  };
+
   return (
     <Card className="bg-gray-100 dark:bg-zinc-800 p-4 flex flex-col justify-between h-full overflow-hidden">
       <Link to={`/view-book-details/${data._id}`} className="flex-1">
@@ -62,7 +80,7 @@ const BookCard = ({ data, favourite, onRemove }) => {
             />
           </div>
           <h2 className="mt-4 text-xl text-gray-800 dark:text-white font-semibold">
-            {data.title}
+            {renderHighlighted(data.title || "", highlightQuery)}
           </h2>
           <p className="mt-2 text-gray-600 dark:text-zinc-400 font-semibold">
             by {data.author}

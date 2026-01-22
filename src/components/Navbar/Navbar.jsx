@@ -1,8 +1,12 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { FaGripLines } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { FaSearch } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
 import ThemeToggle from "../ThemeToggle"; // Import the ThemeToggle component
+import axios from "axios";
+import BaseULR from "../../assets/baseURL";
+import { setCart } from "../../store/cart";
 
 const Navbar = () => {
   const baseLinks = [
@@ -17,6 +21,8 @@ const Navbar = () => {
   const role = useSelector((state) => state.auth.role);
   const avatar = useSelector((state) => state.auth.avatar);
   const username = useSelector((state) => state.auth.username);
+  const cartCount = useSelector((state) => state.cart?.items?.length || 0);
+  const dispatch = useDispatch();
 
   // Filter links based on role and login status
   const links = baseLinks.filter((item) => {
@@ -37,9 +43,64 @@ const Navbar = () => {
   });
 
   const [mobileNavVisible, setMobileNavVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchVisible, setMobileSearchVisible] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isAllBooks = location.pathname.startsWith("/all-books");
+
+  // Debounce live-search navigation while typing, but only when on All Books page
+  useEffect(() => {
+    if (!isAllBooks) return;
+    const q = (searchQuery || "").trim();
+    const timer = setTimeout(() => {
+      if (q) {
+        navigate(`/all-books?search=${encodeURIComponent(q)}`, {
+          replace: true,
+        });
+      } else {
+        navigate(`/all-books`, { replace: true });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, navigate, isAllBooks]);
+
+  // Fetch cart when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      const fetchCart = async () => {
+        try {
+          const headers = {
+            id: localStorage.getItem("id"),
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          };
+          const res = await axios.get(`${BaseULR}api/v1/get-user-cart`, {
+            headers,
+          });
+          dispatch(setCart(res.data.data || []));
+        } catch (err) {
+          console.error("Error fetching cart:", err);
+        }
+      };
+      fetchCart();
+    }
+  }, [isLoggedIn, dispatch]);
 
   const toggleMobileNav = () => {
     setMobileNavVisible(!mobileNavVisible);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const q = (searchQuery || "").trim();
+    if (!q) return;
+    // If not already on All Books, navigate there; otherwise the debounce effect will update
+    if (!isAllBooks) {
+      navigate(`/all-books?search=${encodeURIComponent(q)}`);
+    }
+    setMobileNavVisible(false);
+    setMobileSearchVisible(false);
   };
 
   return (
@@ -54,7 +115,31 @@ const Navbar = () => {
           <h1 className="text-2xl font-semibold">BooksMart</h1>
         </Link>
         <div className="nav-links-bookheaven block md:flex items-center gap-4">
-          <div className="hidden md:flex gap-4">
+          {/* Desktop search (visible md and up) - only on /all-books */}
+          {isAllBooks && (
+            <form
+              onSubmit={handleSearchSubmit}
+              className="hidden md:flex items-center mr-4"
+              role="search"
+              aria-label="Search books"
+            >
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search books..."
+                className="w-64 md:w-80 px-3 py-2 rounded-l border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-700 text-sm focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition"
+                aria-label="Search"
+              >
+                <FaSearch />
+              </button>
+            </form>
+          )}
+          <div className="hidden md:flex gap-4 items-center">
             {links.map((item, i) => {
               // Show avatar instead of 'Profile' when logged in
               if (item.title === "Profile" && isLoggedIn) {
@@ -62,7 +147,11 @@ const Navbar = () => {
                   avatar ||
                   "https://cdn.iconscout.com/icon/free/png-512/free-avatar-icon-download-in-svg-png-gif-file-formats--telegram-logo-man-ui-pack-miscellaneous-icons-840229.png?f=webp&w=256";
                 return (
-                  <Link to={item.link} key={i} className="px-1">
+                  <Link
+                    to={item.link}
+                    key={i}
+                    className="px-1 flex items-center"
+                  >
                     <img
                       src={imgSrc}
                       alt={username || "profile"}
@@ -78,11 +167,18 @@ const Navbar = () => {
                   className={`${
                     item.title === "Admin Profile"
                       ? "px-4 py-1 border border-blue-500 rounded hover:bg-gray-200 dark:hover:bg-zinc-900 hover:text-black dark:hover:text-white"
-                      : "hover:text-blue-500"
+                      : item.title === "Cart"
+                        ? "px-4 py-1 hover:text-blue-500 relative"
+                        : "px-4 py-1 hover:text-blue-500"
                   } transition duration-300`}
                   key={i}
                 >
                   {item.title}
+                  {item.title === "Cart" && isLoggedIn && cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+                      {cartCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -130,6 +226,46 @@ const Navbar = () => {
           mobileNavVisible ? "block" : "hidden"
         } bg-gray-100 dark:bg-zinc-800 absolute inset-0 z-40 flex flex-col items-center justify-center overflow-auto p-6`}
       >
+        {/* Mobile search: show icon first, reveal field when tapped. Only on /all-books */}
+        {isAllBooks && (
+          <div className="w-full max-w-md mb-4">
+            <button
+              onClick={() => setMobileSearchVisible(!mobileSearchVisible)}
+              className="flex items-center gap-2 px-4 py-2 rounded bg-white dark:bg-zinc-700 border border-gray-200 dark:border-zinc-700 w-full justify-start"
+              aria-expanded={mobileSearchVisible}
+              aria-controls="mobile-search-field"
+            >
+              <FaSearch />
+              <span className="ml-2">Search books</span>
+            </button>
+
+            {mobileSearchVisible && (
+              <form
+                id="mobile-search-field"
+                onSubmit={handleSearchSubmit}
+                className="mt-3"
+                role="search"
+                aria-label="Search books mobile"
+              >
+                <div className="flex w-full">
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search books..."
+                    className="flex-1 px-3 py-2 rounded-l border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-700 text-base focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition"
+                  >
+                    <FaSearch />
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
         {links.map((item, i) => {
           if (item.title === "Profile" && isLoggedIn) {
             const imgSrc =

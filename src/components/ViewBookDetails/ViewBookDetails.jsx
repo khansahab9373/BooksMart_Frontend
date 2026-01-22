@@ -5,9 +5,10 @@ import { GrLanguage } from "react-icons/gr";
 import Loader from "../Loader/Loader";
 import { FaHeart, FaShoppingCart, FaEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Swal from "sweetalert2"; // Import SweetAlert2
 import BaseULR from "../../assets/baseURL";
+import { addToCart } from "../../store/cart";
 
 const ViewBookDetails = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const ViewBookDetails = () => {
   const [Data, setData] = useState(null);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const role = useSelector((state) => state.auth.role);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetch = async () => {
@@ -35,7 +37,7 @@ const ViewBookDetails = () => {
       const response = await axios.put(
         `${BaseULR}api/v1/add-book-to-favourite`,
         {},
-        { headers }
+        { headers },
       );
 
       // SweetAlert for success
@@ -57,11 +59,12 @@ const ViewBookDetails = () => {
       const response = await axios.put(
         `${BaseULR}api/v1/add-to-cart`,
         {},
-        { headers }
+        { headers },
       );
 
       // SweetAlert for success
       Swal.fire("Added to Cart", response.data.message, "success");
+      dispatch(addToCart(Data));
     } catch (error) {
       console.error("Error adding to cart:", error);
 
