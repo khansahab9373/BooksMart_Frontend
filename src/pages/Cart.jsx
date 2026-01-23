@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import BaseULR from "../assets/baseURL";
 import { useDispatch, useSelector } from "react-redux";
-import { setCart, removeFromCart } from "../store/cart";
+import { setCart, removeFromCart, addToCart, clearCart } from "../store/cart";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ const Cart = () => {
   useEffect(() => {
     let sum = 0;
     cartItems.forEach((item) => {
-      sum += item.price;
+      sum += item.price * item.quantity;
     });
     setTotal(sum);
   }, [cartItems]);
@@ -88,6 +88,36 @@ const Cart = () => {
     }
   };
 
+  // ✅ Increase quantity
+  const increaseQuantity = async (bookid) => {
+    try {
+      await axios.put(
+        `${BaseULR}api/v1/add-to-cart`,
+        {},
+        { headers: { ...headers, bookid } },
+      );
+
+      dispatch(addToCart(cartItems.find((item) => item._id === bookid)));
+    } catch (err) {
+      Swal.fire("Error", "Failed to increase quantity.", "error");
+    }
+  };
+
+  // ✅ Decrease quantity
+  const decreaseQuantity = async (bookid) => {
+    try {
+      await axios.put(
+        `${BaseULR}api/v1/remove-from-cart/${bookid}`,
+        {},
+        { headers },
+      );
+
+      dispatch(removeFromCart(bookid));
+    } catch (err) {
+      Swal.fire("Error", "Failed to decrease quantity.", "error");
+    }
+  };
+
   const placeOrder = async () => {
     const result = await Swal.fire({
       title: "Place order?",
@@ -101,9 +131,16 @@ const Cart = () => {
     try {
       await axios.post(
         `${BaseULR}api/v1/place-order`,
-        { order: cartItems },
+        {
+          order: cartItems.map((item) => ({
+            bookId: item._id,
+            quantity: item.quantity,
+          })),
+        },
         { headers },
       );
+      clearCart();
+      dispatch(clearCart());
 
       Swal.fire("Success", "Order placed successfully", "success");
       navigate("/profile/orderHistory");
@@ -178,7 +215,24 @@ const Cart = () => {
                   </div>
 
                   <div className="flex items-center gap-6 mt-4 md:mt-0">
-                    <h2 className="text-3xl font-semibold">₹{item.price}</h2>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => decreaseQuantity(item._id)}
+                        className="bg-gray-200 text-gray-700 rounded px-2 py-1 hover:bg-gray-300"
+                      >
+                        -
+                      </button>
+                      <span className="text-xl">{item.quantity}</span>
+                      <button
+                        onClick={() => increaseQuantity(item._id)}
+                        className="bg-gray-200 text-gray-700 rounded px-2 py-1 hover:bg-gray-300"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <h2 className="text-3xl font-semibold">
+                      ₹{item.price * item.quantity}
+                    </h2>
                     <button
                       onClick={() => deleteItem(item._id)}
                       className="bg-red-100 text-red-700 border border-red-600
@@ -197,7 +251,10 @@ const Cart = () => {
                 <h2 className="text-3xl font-semibold mb-4">Total Amount</h2>
 
                 <div className="flex justify-between text-xl mb-4">
-                  <span>{cartItems.length} books</span>
+                  <span>
+                    {cartItems.reduce((sum, item) => sum + item.quantity, 0)}{" "}
+                    books
+                  </span>
                   <span>₹{total}</span>
                 </div>
 

@@ -94,17 +94,20 @@ const UserOrderHistory = () => {
             <div className="w-[22%]">
               <h1 className="text-black dark:text-white">Books</h1>
             </div>
-            <div className="hidden md:block md:w-[45%]">
+            <div className="hidden md:block md:w-[35%]">
               <h1 className="text-black dark:text-white">Description</h1>
             </div>
             <div className="w-[9%]">
               <h1 className="text-black dark:text-white">Price</h1>
             </div>
-            <div className="w-[16%]">
+            <div className="w-[9%]">
+              <h1 className="text-black dark:text-white">Qty</h1>
+            </div>
+            <div className="w-[12%]">
               <h1 className="text-black dark:text-white">Status</h1>
             </div>
-            <div className="hidden md:block md:w-[5%]">
-              <h1 className="text-black dark:text-white">Mode</h1>
+            <div className="w-[10%]">
+              <h1 className="text-black dark:text-white">Time</h1>
             </div>
           </div>
 
@@ -129,7 +132,7 @@ const UserOrderHistory = () => {
                   {order.book.title}
                 </Link>
               </div>
-              <div className="w-full hidden md:block md:w-[45%]">
+              <div className="w-full hidden md:block md:w-[35%]">
                 <h1 className="text-black dark:text-white">
                   {order.book.desc.slice(0, 50)}...
                 </h1>
@@ -142,7 +145,15 @@ const UserOrderHistory = () => {
                   ₹{order.book.price}
                 </h1>
               </div>
-              <div className="w-full sm:w-[16%]">
+              <div className="w-full sm:w-[9%]">
+                <div className="sm:hidden text-sm text-gray-600 dark:text-zinc-300 mb-1">
+                  Qty
+                </div>
+                <h1 className="text-black dark:text-white">
+                  {order.quantity || 1}
+                </h1>
+              </div>
+              <div className="w-full sm:w-[12%]">
                 <div className="sm:hidden text-sm text-gray-600 dark:text-zinc-300 mb-1">
                   Status
                 </div>
@@ -159,9 +170,12 @@ const UserOrderHistory = () => {
                   })()}
                 </h1>
               </div>
-              <div className="w-full hidden md:block md:w-[5%]">
+              <div className="w-full sm:w-[10%]">
+                <div className="sm:hidden text-sm text-gray-600 dark:text-zinc-300 mb-1">
+                  Time
+                </div>
                 <h1 className="text-sm text-gray-600 dark:text-zinc-400">
-                  COD
+                  {new Date(order.createdAt).toLocaleString()}
                 </h1>
               </div>
             </div>

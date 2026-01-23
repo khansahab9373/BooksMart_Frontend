@@ -17,6 +17,7 @@ const ViewBookDetails = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const role = useSelector((state) => state.auth.role);
   const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items);
 
   useEffect(() => {
     const fetch = async () => {
@@ -55,6 +56,18 @@ const ViewBookDetails = () => {
   };
 
   const handleCart = async () => {
+    const existing = cartItems.find((item) => item._id === Data._id);
+    if (existing) {
+      const result = await Swal.fire({
+        title: "Book already in cart",
+        text: `You have ${existing.quantity} of this book. Add another?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, add one more",
+      });
+      if (!result.isConfirmed) return;
+    }
+
     try {
       const response = await axios.put(
         `${BaseULR}api/v1/add-to-cart`,
@@ -62,13 +75,15 @@ const ViewBookDetails = () => {
         { headers },
       );
 
-      // SweetAlert for success
-      Swal.fire("Added to Cart", response.data.message, "success");
       dispatch(addToCart(Data));
+
+      Swal.fire(
+        "Added to Cart",
+        existing ? "Quantity increased!" : response.data.message,
+        "success",
+      );
     } catch (error) {
       console.error("Error adding to cart:", error);
-
-      // SweetAlert for error
       Swal.fire({
         icon: "error",
         title: "Error",

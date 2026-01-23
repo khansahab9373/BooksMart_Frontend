@@ -34,7 +34,7 @@ const AllOrders = () => {
       id: localStorage.getItem("id"),
       authorization: `Bearer ${localStorage.getItem("token")}`,
     }),
-    []
+    [],
   );
 
   const fetchOrders = async () => {
@@ -69,15 +69,15 @@ const AllOrders = () => {
       const res = await axios.put(
         `${BaseURL}api/v1/update-status/${orderId}`,
         { status: statusValue },
-        { headers }
+        { headers },
       );
 
       Swal.fire("Updated", res.data.message, "success");
 
       setOrders((prev) =>
         prev.map((order) =>
-          order._id === orderId ? { ...order, status: statusValue } : order
-        )
+          order._id === orderId ? { ...order, status: statusValue } : order,
+        ),
       );
 
       setActiveOrderId(null);
@@ -137,8 +137,8 @@ const AllOrders = () => {
               const statusColor = statusLower.includes("cancel")
                 ? "text-red-500"
                 : statusLower.includes("placed")
-                ? "text-yellow-500"
-                : "text-green-500";
+                  ? "text-yellow-500"
+                  : "text-green-500";
 
               return (
                 <Card
@@ -149,7 +149,7 @@ const AllOrders = () => {
                     {index + 1}
                   </div>
 
-                  <div className="w-full sm:w-[30%]">
+                  <div className="w-full sm:w-[25%]">
                     <Link
                       to={`/view-book-details/${order.book._id}`}
                       className="font-semibold hover:text-blue-500"
@@ -158,13 +158,15 @@ const AllOrders = () => {
                     </Link>
                   </div>
 
-                  <div className="hidden md:block md:w-[35%] text-sm">
+                  <div className="hidden md:block md:w-[25%] text-sm">
                     {order.book.desc?.slice(0, 60)}...
                   </div>
 
-                  <div className="w-full sm:w-[10%]">₹{order.book.price}</div>
+                  <div className="w-full sm:w-[8%]">₹{order.book.price}</div>
 
-                  <div className="w-full sm:w-[15%]">
+                  <div className="w-full sm:w-[8%]">{order.quantity || 1}</div>
+
+                  <div className="w-full sm:w-[12%]">
                     <button
                       className={`font-semibold ${statusColor}`}
                       onClick={() => {
@@ -208,6 +210,10 @@ const AllOrders = () => {
                         </button>
                       </div>
                     )}
+                  </div>
+
+                  <div className="w-full sm:w-[12%] text-sm text-gray-600 dark:text-zinc-400">
+                    {new Date(order.createdAt).toLocaleString()}
                   </div>
 
                   <div className="w-full sm:w-[5%]">

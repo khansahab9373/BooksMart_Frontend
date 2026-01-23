@@ -21,7 +21,10 @@ const Navbar = () => {
   const role = useSelector((state) => state.auth.role);
   const avatar = useSelector((state) => state.auth.avatar);
   const username = useSelector((state) => state.auth.username);
-  const cartCount = useSelector((state) => state.cart?.items?.length || 0);
+  const cartCount = useSelector(
+    (state) =>
+      state.cart.items.reduce((sum, item) => sum + item.quantity, 0) || 0,
+  );
   const dispatch = useDispatch();
 
   // Filter links based on role and login status

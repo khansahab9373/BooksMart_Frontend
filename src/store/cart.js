@@ -9,13 +9,33 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     setCart: (state, action) => {
-      state.items = action.payload;
+      // action.payload is array of {book, quantity}
+      state.items = action.payload.map((item) => ({
+        ...item.book,
+        quantity: item.quantity,
+      }));
     },
     addToCart: (state, action) => {
-      state.items.push(action.payload);
+      const existingIndex = state.items.findIndex(
+        (item) => item._id === action.payload._id,
+      );
+      if (existingIndex !== -1) {
+        state.items[existingIndex].quantity += 1;
+      } else {
+        state.items.push({ ...action.payload, quantity: 1 });
+      }
     },
     removeFromCart: (state, action) => {
-      state.items = state.items.filter((item) => item._id !== action.payload);
+      const index = state.items.findIndex(
+        (item) => item._id === action.payload,
+      );
+      if (index !== -1) {
+        if (state.items[index].quantity > 1) {
+          state.items[index].quantity -= 1;
+        } else {
+          state.items.splice(index, 1);
+        }
+      }
     },
     clearCart: (state) => {
       state.items = [];
