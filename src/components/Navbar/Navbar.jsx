@@ -5,7 +5,7 @@ import { FaSearch } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import ThemeToggle from "../ThemeToggle"; // Import the ThemeToggle component
 import axios from "axios";
-import BaseURL from "../../assets/baseURL";
+import BaseULR from "../../assets/baseURL";
 import { setCart } from "../../store/cart";
 
 const Navbar = () => {
@@ -78,7 +78,7 @@ const Navbar = () => {
             id: localStorage.getItem("id"),
             authorization: `Bearer ${localStorage.getItem("token")}`,
           };
-          const res = await axios.get(`${BaseURL}api/v1/get-user-cart`, {
+          const res = await axios.get(`${BaseULR}api/v1/get-user-cart`, {
             headers,
           });
           dispatch(setCart(res.data.data || []));

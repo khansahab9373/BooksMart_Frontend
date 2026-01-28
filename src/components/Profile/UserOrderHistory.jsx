@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import { Link } from "react-router-dom";
-import BaseURL from "../../assets/baseURL";
+import BaseULR from "../../assets/baseURL";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 
@@ -20,7 +20,7 @@ const UserOrderHistory = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`${BaseURL}api/v1/get-order-history`, {
+        const response = await axios.get(`${BaseULR}api/v1/get-order-history`, {
           headers,
         });
         setOrderHistory(response.data.data);

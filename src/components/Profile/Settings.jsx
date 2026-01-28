@@ -3,7 +3,7 @@ import Cropper from "react-easy-crop";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import Swal from "sweetalert2"; // Import SweetAlert2
-import BaseURL from "../../assets/baseURL";
+import BaseULR from "../../assets/baseURL";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store/auth";
 import Card from "../ui/Card";
@@ -40,8 +40,8 @@ const Settings = () => {
       try {
         setError(null);
         const response = await axios.get(
-          `${BaseURL}api/v1/get-user-information`,
-          { headers },
+          `${BaseULR}api/v1/get-user-information`,
+          { headers }
         );
         setProfileData(response.data);
         setValue({ address: response.data.address });
@@ -75,9 +75,9 @@ const Settings = () => {
     setIsSubmitting(true); // Show loading state
     try {
       const response = await axios.put(
-        `${BaseURL}api/v1/update-address`,
+        `${BaseULR}api/v1/update-address`,
         value,
-        { headers },
+        { headers }
       );
       console.log("Address updated successfully:", response.data);
 
@@ -132,7 +132,7 @@ const Settings = () => {
           0,
           0,
           pixelCrop.width,
-          pixelCrop.height,
+          pixelCrop.height
         );
         canvas.toBlob(
           (blob) => {
@@ -140,7 +140,7 @@ const Settings = () => {
             resolve(blob);
           },
           "image/jpeg",
-          0.9,
+          0.9
         );
       };
       image.onerror = (err) => reject(err);
@@ -157,7 +157,7 @@ const Settings = () => {
         tempFile.name || "Profile Picture.jpg",
         {
           type: blob.type,
-        },
+        }
       );
 
       if (croppedPreviewUrl) URL.revokeObjectURL(croppedPreviewUrl);
@@ -203,7 +203,7 @@ const Settings = () => {
     formData.append("avatar", avatarFile);
     try {
       const response = await axios.put(
-        `${BaseURL}api/v1/update-avatar`,
+        `${BaseULR}api/v1/update-avatar`,
         formData,
         {
           headers: {
@@ -211,7 +211,7 @@ const Settings = () => {
             id: localStorage.getItem("id"),
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        },
+        }
       );
       // update UI and redux
       setProfileData({ ...profileData, avatar: response.data.avatar });

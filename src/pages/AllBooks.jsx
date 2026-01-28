@@ -3,7 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "../components/Loader/Loader";
 import BookCard from "../components/BookCard/BookCard";
-import BaseURL from "../assets/baseURL";
+import BaseULR from "../assets/baseURL";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 
@@ -20,7 +20,7 @@ const AllBooks = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`${BaseURL}api/v1/get-all-books`);
+        const response = await axios.get(`${BaseULR}api/v1/get-all-books`);
         const all = response.data.data || [];
         setOriginalData(all);
         setData(all);
@@ -50,7 +50,8 @@ const AllBooks = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white flex flex-col items-center justify-center">
       {/* <div className="bg-gray-100 dark:bg-zinc-800 h-auto px-4 sm:px-8 py-8 rounded-lg shadow-lg overflow-hidden w-full max-w-7xl"> */}
-      <div className="bg-gray-100 dark:bg-zinc-800 h-auto px-4 sm:px-8 py-8 rounded-lg shadow-lg overflow-hidden w-full">
+<div className="bg-gray-100 dark:bg-zinc-800 h-auto px-4 sm:px-8 py-8 rounded-lg shadow-lg overflow-hidden w-full">
+
         <h4 className="text-3xl text-gray-800 dark:text-yellow-100 font-semibold">
           All Books
         </h4>

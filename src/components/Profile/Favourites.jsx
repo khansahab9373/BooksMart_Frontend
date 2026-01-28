@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import axios from "axios";
 import BookCard from "../BookCard/BookCard";
 import Loader from "../Loader/Loader";
-import BaseURL from "../../assets/baseURL";
+import BaseULR from "../../assets/baseURL";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { Link } from "react-router-dom";
@@ -23,8 +23,8 @@ const Favourites = () => {
       setError(null);
       try {
         const response = await axios.get(
-          `${BaseURL}api/v1/get-favourite-books`,
-          { headers },
+          `${BaseULR}api/v1/get-favourite-books`,
+          { headers }
         );
         setFavouriteBooks(response.data.data || []);
       } catch (err) {

@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import Swal from "sweetalert2"; // Import SweetAlert2
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
-import BaseURL from "../assets/baseURL";
+import BaseULR from "../assets/baseURL";
 
 const Login = () => {
   const [Values, setValues] = useState({
@@ -36,7 +36,7 @@ const Login = () => {
         return;
       } else {
         setLoading(true);
-        const response = await axios.post(`${BaseURL}api/v1/sign-in`, Values);
+        const response = await axios.post(`${BaseULR}api/v1/sign-in`, Values);
 
         // save tokens and basic info
         localStorage.setItem("id", response.data.id);
@@ -47,13 +47,13 @@ const Login = () => {
         // fetch full user info (to get avatar and username)
         try {
           const userRes = await axios.get(
-            `${BaseURL}api/v1/get-user-information`,
+            `${BaseULR}api/v1/get-user-information`,
             {
               headers: {
                 Authorization: `Bearer ${response.data.token}`,
                 id: response.data.id,
               },
-            },
+            }
           );
           const user = userRes.data;
           dispatch(
@@ -62,7 +62,7 @@ const Login = () => {
               token: response.data.token,
               username: user.username,
               avatar: user.avatar,
-            }),
+            })
           );
         } catch (err) {
           console.warn("Could not fetch user info after login:", err);
@@ -72,7 +72,7 @@ const Login = () => {
             authActions.setUser({
               id: response.data.id,
               token: response.data.token,
-            }),
+            })
           );
         }
 

@@ -7,7 +7,7 @@ import { FaHeart, FaShoppingCart, FaEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import Swal from "sweetalert2"; // Import SweetAlert2
-import BaseURL from "../../assets/baseURL";
+import BaseULR from "../../assets/baseURL";
 import { addToCart } from "../../store/cart";
 
 const ViewBookDetails = () => {
@@ -21,7 +21,7 @@ const ViewBookDetails = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await axios.get(`${BaseURL}api/v1/get-book-by-id/${id}`);
+      const response = await axios.get(`${BaseULR}api/v1/get-book-by-id/${id}`);
       setData(response.data.data);
     };
     fetch();
@@ -36,7 +36,7 @@ const ViewBookDetails = () => {
   const handleFavourite = async () => {
     try {
       const response = await axios.put(
-        `${BaseURL}api/v1/add-book-to-favourite`,
+        `${BaseULR}api/v1/add-book-to-favourite`,
         {},
         { headers },
       );
@@ -70,7 +70,7 @@ const ViewBookDetails = () => {
 
     try {
       const response = await axios.put(
-        `${BaseURL}api/v1/add-to-cart`,
+        `${BaseULR}api/v1/add-to-cart`,
         {},
         { headers },
       );
@@ -104,7 +104,7 @@ const ViewBookDetails = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`${BaseURL}api/v1/delete-book`, {
+          const response = await axios.delete(`${BaseULR}api/v1/delete-book`, {
             headers,
           });
 

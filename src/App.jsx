@@ -12,7 +12,7 @@ import ViewBookDetails from "./components/ViewBookDetails/ViewBookDetails";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "./store/auth";
 import axios from "axios";
-import BaseURL from "./assets/baseURL";
+import BaseULR from "./assets/baseURL";
 import Favourites from "./components/Profile/Favourites";
 import UserOrderHistory from "./components/Profile/UserOrderHistory";
 import Settings from "./components/Profile/Settings";
@@ -35,7 +35,7 @@ const App = () => {
       // fetch user info to populate avatar/username in store
       (async () => {
         try {
-          const res = await axios.get(`${BaseURL}api/v1/get-user-information`, {
+          const res = await axios.get(`${BaseULR}api/v1/get-user-information`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               id: localStorage.getItem("id"),
@@ -79,7 +79,6 @@ const App = () => {
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/LogIn" element={<LogIn />} />
         <Route path="/updateBook/:id" element={<UpdateBook />} />{" "}
-        {/* Corrected path */}
         <Route path="/view-book-details/:id" element={<ViewBookDetails />} />
       </Routes>
       <Footer />

@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 import axios from "axios";
 import Loader from "../components/Loader/Loader";
 import MobileNav from "../components/Profile/MobileNav";
-import BaseURL from "../assets/baseURL";
+import BaseULR from "../assets/baseURL";
 
 const Profile = () => {
   const [Profile, setProfile] = useState(null);
@@ -17,8 +17,8 @@ const Profile = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BaseURL}api/v1/get-user-information`,
-          { headers },
+          `${BaseULR}api/v1/get-user-information`,
+          { headers }
         );
         setProfile(response.data);
       } catch (error) {
