@@ -1,7 +1,7 @@
-import  { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2"; // Import SweetAlert2
-import BaseULR from "../../assets/baseURL";
+import BaseURL from "../../assets/baseURL";
 
 const AddBook = () => {
   const [Data, setData] = useState({
@@ -42,7 +42,7 @@ const AddBook = () => {
           text: "All fields are required!",
         });
       } else {
-        const response = await axios.post(`${BaseULR}api/v1/add-book`, Data, {
+        const response = await axios.post(`${BaseURL}api/v1/add-book`, Data, {
           headers,
         });
         setData({

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2"; // Import SweetAlert2
-import BaseULR from "../../assets/baseURL";
+import BaseURL from "../../assets/baseURL";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 
@@ -19,7 +19,7 @@ const BookCard = ({ data, favourite, onRemove, highlightQuery = "" }) => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `${BaseULR}api/v1/remove-book-from-favourite`,
+        `${BaseURL}api/v1/remove-book-from-favourite`,
         {}, // Empty body as headers contain data
         { headers },
       );

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2"; // Import SweetAlert2
-import BaseULR from "../assets/baseURL";
+import BaseURL from "../assets/baseURL";
 
 const UpdateBook = () => {
   const [Data, setData] = useState({
@@ -48,7 +48,7 @@ const UpdateBook = () => {
         });
         return;
       } else {
-        const response = await axios.put(`${BaseULR}api/v1/update-book`, Data, {
+        const response = await axios.put(`${BaseURL}api/v1/update-book`, Data, {
           headers,
         });
         setData({
@@ -87,7 +87,7 @@ const UpdateBook = () => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          `${BaseULR}api/v1/get-book-by-id/${id}`
+          `${BaseURL}api/v1/get-book-by-id/${id}`,
         );
         setData(response.data.data);
       } catch (error) {

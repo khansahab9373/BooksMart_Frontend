@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BookCard from "../BookCard/BookCard";
 import Loader from "../Loader/Loader";
-import BaseULR from "../../assets/baseURL";
+import BaseURL from "../../assets/baseURL";
 
 const RecentlyAdded = () => {
   const [Data, setData] = useState();
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await axios.get(`${BaseULR}api/v1/get-recent-books`);
+      const response = await axios.get(`${BaseURL}api/v1/get-recent-books`);
       setData(response.data.data);
     };
     fetch();

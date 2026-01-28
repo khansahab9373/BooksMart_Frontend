@@ -12,7 +12,7 @@ import ViewBookDetails from "./components/ViewBookDetails/ViewBookDetails";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "./store/auth";
 import axios from "axios";
-import BaseULR from "./assets/baseURL";
+import BaseURL from "./assets/baseURL";
 import Favourites from "./components/Profile/Favourites";
 import UserOrderHistory from "./components/Profile/UserOrderHistory";
 import Settings from "./components/Profile/Settings";
@@ -35,7 +35,7 @@ const App = () => {
       // fetch user info to populate avatar/username in store
       (async () => {
         try {
-          const res = await axios.get(`${BaseULR}api/v1/get-user-information`, {
+          const res = await axios.get(`${BaseURL}api/v1/get-user-information`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               id: localStorage.getItem("id"),
@@ -48,7 +48,7 @@ const App = () => {
               token: localStorage.getItem("token"),
               username: user.username,
               avatar: user.avatar,
-            })
+            }),
           );
         } catch (err) {
           console.warn("Failed to load user info on app start", err);

@@ -1,5 +1,5 @@
-let BaseULR = `https://booksmart-backend-rose.vercel.app/`;
+let BaseURL = `https://booksmart-backend-rose.vercel.app/`;
 
-// let BaseULR = `http://localhost:3000/`;
+// let BaseURL = `http://localhost:3000/`;
 
-export default BaseULR;
+export default BaseURL;
