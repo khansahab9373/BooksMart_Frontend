@@ -6,7 +6,7 @@ import Button from "../components/ui/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import BaseULR from "../assets/baseURL";
+import BaseURL from "../assets/baseURL";
 import { useDispatch, useSelector } from "react-redux";
 import { setCart, removeFromCart, addToCart, clearCart } from "../store/cart";
 
@@ -28,7 +28,7 @@ const Cart = () => {
   const fetchCart = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseULR}api/v1/get-user-cart`, {
+      const res = await axios.get(`${BaseURL}api/v1/get-user-cart`, {
         headers,
       });
 
@@ -75,7 +75,7 @@ const Cart = () => {
 
     try {
       await axios.put(
-        `${BaseULR}api/v1/remove-from-cart/${bookid}`,
+        `${BaseURL}api/v1/remove-from-cart/${bookid}`,
         {},
         { headers },
       );
@@ -92,7 +92,7 @@ const Cart = () => {
   const increaseQuantity = async (bookid) => {
     try {
       await axios.put(
-        `${BaseULR}api/v1/add-to-cart`,
+        `${BaseURL}api/v1/add-to-cart`,
         {},
         { headers: { ...headers, bookid } },
       );
@@ -107,7 +107,7 @@ const Cart = () => {
   const decreaseQuantity = async (bookid) => {
     try {
       await axios.put(
-        `${BaseULR}api/v1/remove-from-cart/${bookid}`,
+        `${BaseURL}api/v1/remove-from-cart/${bookid}`,
         {},
         { headers },
       );
@@ -130,7 +130,7 @@ const Cart = () => {
 
     try {
       await axios.post(
-        `${BaseULR}api/v1/place-order`,
+        `${BaseURL}api/v1/place-order`,
         {
           order: cartItems.map((item) => ({
             bookId: item._id,
