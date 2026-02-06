@@ -139,7 +139,7 @@ const Cart = () => {
         },
         { headers },
       );
-      clearCart();
+      // clearCart();
       dispatch(clearCart());
 
       Swal.fire("Success", "Order placed successfully", "success");
@@ -210,7 +210,9 @@ const Cart = () => {
                   <div className="flex-1 md:px-6 mt-4 md:mt-0">
                     <h2 className="text-2xl font-semibold">{item.title}</h2>
                     <p className="text-gray-600 dark:text-zinc-300 mt-2 hidden md:block">
-                      {item.desc.slice(0, 100)}...
+                      {/* {item.desc.slice(0, 100)}... */}
+                      {item.desc?.slice(0, 100) || ""}
+
                     </p>
                   </div>
 

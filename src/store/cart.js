@@ -14,6 +14,12 @@ const cartSlice = createSlice({
         ...item.book,
         quantity: item.quantity,
       }));
+      // state.items = (action.payload || [])
+      //   .filter((item) => item.book) // 🔥 null remove
+      //   .map((item) => ({
+      //     ...item.book,
+      //     quantity: item.quantity,
+      //   }));
     },
     addToCart: (state, action) => {
       const existingIndex = state.items.findIndex(
@@ -25,6 +31,16 @@ const cartSlice = createSlice({
         state.items.push({ ...action.payload, quantity: 1 });
       }
     },
+    // addToCart: (state, action) => {
+    //   const existingIndex = state.items.findIndex(
+    //     (item) => item._id === action.payload,
+    //   );
+
+    //   if (existingIndex !== -1) {
+    //     state.items[existingIndex].quantity += 1;
+    //   }
+    // },
+
     removeFromCart: (state, action) => {
       const index = state.items.findIndex(
         (item) => item._id === action.payload,
