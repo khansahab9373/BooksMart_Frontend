@@ -40,15 +40,11 @@ const AllOrders = () => {
   const fetchOrders = async () => {
     setLoading(true);
     setError(null);
-
     try {
-      const res = await axios.get(`${BaseURL}api/v1/get-all-orders`, {
-        headers,
-      });
+      const res = await axios.get(`${BaseURL}api/v1/get-all-orders`, { headers });
       setOrders(res.data.data || []);
     } catch (err) {
-      console.error(err);
-      setError("Failed to load orders. Please try again.");
+      setError("Failed to load orders.");
       Swal.fire("Error", "Failed to fetch orders.", "error");
     } finally {
       setLoading(false);
@@ -75,8 +71,8 @@ const AllOrders = () => {
       Swal.fire("Updated", res.data.message, "success");
 
       setOrders((prev) =>
-        prev.map((order) =>
-          order._id === orderId ? { ...order, status: statusValue } : order,
+        prev.map((o) =>
+          o._id === orderId ? { ...o, status: statusValue } : o,
         ),
       );
 
@@ -88,87 +84,96 @@ const AllOrders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 px-4 py-6">
-      {/* Loading */}
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 px-4 py-6">
       {loading && (
         <div className="flex justify-center items-center h-48">
           <Loader />
         </div>
       )}
 
-      {/* Error */}
       {!loading && error && (
         <div className="flex justify-center">
-          <Card className="max-w-md text-center p-6">
-            <div className="text-3xl mb-2">⚠️</div>
-            <p className="mb-4 text-gray-700 dark:text-zinc-200">{error}</p>
+          <Card className="p-6 text-center">
+            <p className="mb-4">{error}</p>
             <Button onClick={fetchOrders}>Retry</Button>
           </Card>
         </div>
       )}
 
-      {/* Empty */}
-      {!loading && !error && orders.length === 0 && (
-        <div className="flex justify-center items-center h-[60vh]">
-          <Card className="p-10 text-center">
-            <div className="text-4xl mb-3">🛒</div>
-            <h2 className="text-xl font-semibold text-gray-700 dark:text-zinc-200">
-              No Orders Yet
-            </h2>
-            <p className="text-gray-500 mt-2">
-              Orders will appear here once placed.
-            </p>
-          </Card>
-        </div>
-      )}
-
-      {/* Orders */}
       {!loading && !error && orders.length > 0 && (
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-semibold mb-6 text-gray-800 dark:text-white">
+          <h1 className="text-3xl font-semibold mb-6 text-gray-800 dark:text-white">
             All Orders
           </h1>
 
           {orders
-            .filter((order) => order?.book)
+            .filter((o) => o?.book)
             .map((order, index) => {
               const statusLower = order.status?.toLowerCase() || "";
 
-              const statusColor = statusLower.includes("cancel")
-                ? "text-red-500"
+              const statusBadge = statusLower.includes("cancel")
+                ? "bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400"
                 : statusLower.includes("placed")
-                  ? "text-yellow-500"
-                  : "text-green-500";
+                ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400"
+                : "bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-400";
 
               return (
                 <Card
                   key={order._id}
-                  className="mb-3 p-4 flex flex-col sm:flex-row gap-3"
+                  className="
+                    mb-4 px-4 py-3
+                    flex flex-col sm:flex-row
+                    items-center
+                    gap-3
+                    relative overflow-visible
+                    bg-white dark:bg-zinc-800
+                    border border-gray-200 dark:border-zinc-700
+                    rounded-xl
+                    shadow-sm hover:shadow-md
+                    transition-all duration-300
+                  "
                 >
-                  <div className="w-full sm:w-[5%] text-center">
+                  {/* Index */}
+                  <div className="w-full sm:w-[5%] flex items-center justify-center font-medium">
                     {index + 1}
                   </div>
 
-                  <div className="w-full sm:w-[25%]">
+                  {/* Book */}
+                  <div className="w-full sm:w-[25%] flex items-center justify-center sm:justify-start font-semibold">
                     <Link
                       to={`/view-book-details/${order.book._id}`}
-                      className="font-semibold hover:text-blue-500"
+                      className="hover:text-blue-500 text-center sm:text-left"
                     >
                       {order.book.title}
                     </Link>
                   </div>
 
-                  <div className="hidden md:block md:w-[25%] text-sm">
+                  {/* Description */}
+                  <div className="hidden md:flex md:w-[25%] items-center text-sm text-gray-600 dark:text-zinc-400">
                     {order.book.desc?.slice(0, 60)}...
                   </div>
 
-                  <div className="w-full sm:w-[8%]">₹{order.book.price}</div>
+                  {/* Price */}
+                  <div className="w-full sm:w-[8%] flex items-center justify-center font-medium">
+                    ₹{order.book.price}
+                  </div>
 
-                  <div className="w-full sm:w-[8%]">{order.quantity || 1}</div>
+                  {/* Qty */}
+                  <div className="w-full sm:w-[8%] flex items-center justify-center">
+                    {order.quantity || 1}
+                  </div>
 
-                  <div className="w-full sm:w-[12%]">
+                  {/* Status */}
+                  <div className="w-full sm:w-[12%] relative flex items-center justify-center">
                     <button
-                      className={`font-semibold ${statusColor}`}
+                      className={`
+                        min-w-[130px]
+                        px-4 py-1.5
+                        rounded-full
+                        text-sm font-semibold
+                        flex items-center justify-center
+                        ${statusBadge}
+                      `}
                       onClick={() => {
                         setActiveOrderId(order._id);
                         setStatusValue(order.status);
@@ -178,19 +183,27 @@ const AllOrders = () => {
                     </button>
 
                     {activeOrderId === order._id && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <label
-                          htmlFor={`status-${order._id}`}
-                          className="sr-only"
-                        >
-                          Change order status
-                        </label>
-
+                      <div
+                        className="
+                          absolute top-full mt-2
+                          bg-white dark:bg-zinc-900
+                          border border-gray-200 dark:border-zinc-700
+                          rounded-lg p-2
+                          flex items-center gap-2
+                          z-50 shadow-xl
+                        "
+                      >
                         <select
-                          id={`status-${order._id}`}
-                          className="bg-gray-800 text-white rounded p-1"
+                          className="
+                            bg-gray-100 dark:bg-zinc-800
+                            text-gray-800 dark:text-white
+                            border border-gray-300 dark:border-zinc-600
+                            rounded-md px-2 py-1 text-sm
+                          "
                           value={statusValue}
-                          onChange={(e) => setStatusValue(e.target.value)}
+                          onChange={(e) =>
+                            setStatusValue(e.target.value)
+                          }
                         >
                           {ORDER_STATUSES.map((s) => (
                             <option key={s} value={s}>
@@ -200,32 +213,36 @@ const AllOrders = () => {
                         </select>
 
                         <button
-                          className="text-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
-                          onClick={() => updateOrderStatus(order._id)}
-                          aria-label={`Confirm status update for order ${
-                            index + 1
-                          }`}
+                          className="
+                            text-green-600 dark:text-green-400
+                            p-2 rounded-full
+                            hover:bg-green-500/10
+                          "
+                          onClick={() =>
+                            updateOrderStatus(order._id)
+                          }
                         >
-                          <FaCheck aria-hidden="true" />
+                          <FaCheck size={16} />
                         </button>
                       </div>
                     )}
                   </div>
 
-                  <div className="w-full sm:w-[12%] text-sm text-gray-600 dark:text-zinc-400">
+                  {/* Date */}
+                  <div className="w-full sm:w-[12%] flex items-center justify-center text-sm text-gray-500 dark:text-zinc-400 text-center">
                     {new Date(order.createdAt).toLocaleString()}
                   </div>
 
-                  <div className="w-full sm:w-[5%]">
+                  {/* Action */}
+                  <div className="w-full sm:w-[5%] flex items-center justify-center">
                     <button
-                      className="text-xl hover:text-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
+                      className="text-xl text-gray-600 dark:text-zinc-300 hover:text-orange-500"
                       onClick={() => {
                         setUserModalState("fixed");
                         setSelectedUser(order.user);
                       }}
-                      aria-label={`View user details for order ${index + 1}`}
                     >
-                      <IoOpenOutline aria-hidden="true" />
+                      <IoOpenOutline />
                     </button>
                   </div>
                 </Card>

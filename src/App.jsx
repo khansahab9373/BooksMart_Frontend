@@ -19,7 +19,9 @@ import Settings from "./components/Profile/Settings";
 import AllOrders from "./pages/AllOrders";
 import AddBook from "./components/Profile/AddBook";
 import UpdateBook from "./pages/UpdateBook"; // Updated component import (camelCase)
-
+import TermsAndConditions from "./components/Footer/TermsAndConditions";
+import PrivacyPolicy from "./components/Footer/PrivacyPolicy";
+import PageNotFound from "./pages/PageNotFound";
 const App = () => {
   const dispatch = useDispatch();
   const role = useSelector((state) => state.auth.role);
@@ -48,7 +50,7 @@ const App = () => {
               token: localStorage.getItem("token"),
               username: user.username,
               avatar: user.avatar,
-            })
+            }),
           );
         } catch (err) {
           console.warn("Failed to load user info on app start", err);
@@ -81,6 +83,9 @@ const App = () => {
         <Route path="/updateBook/:id" element={<UpdateBook />} />{" "}
         {/* Corrected path */}
         <Route path="/view-book-details/:id" element={<ViewBookDetails />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Footer />
     </div>

@@ -20,9 +20,11 @@ const Sidebar = ({ data }) => {
         <p className="mt-4 text-xl text-gray-800 dark:text-zinc-100 font-semibold">
           {data.username}
         </p>
-        <p className="mt-1 text-normal text-gray-600 dark:text-zinc-300">
-          {data.email}
-        </p>
+       <p className="mt-1 text-sm text-gray-600 dark:text-zinc-300 
+              break-all text-center max-w-full">
+  {data.email}
+</p>
+
         <div className="w-full mt-4 h-[1px] bg-gray-300 dark:bg-zinc-500"></div>
       </div>
 
