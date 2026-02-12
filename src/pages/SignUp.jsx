@@ -87,7 +87,7 @@ const SignUp = () => {
           0,
           0,
           pixelCrop.width,
-          pixelCrop.height
+          pixelCrop.height,
         );
 
         canvas.toBlob(
@@ -96,7 +96,7 @@ const SignUp = () => {
             resolve(blob);
           },
           "image/jpeg",
-          0.9
+          0.9,
         );
       };
       image.onerror = reject;
@@ -166,7 +166,7 @@ const SignUp = () => {
       Swal.fire(
         "Error",
         err.response?.data?.message || "Signup failed",
-        "error"
+        "error",
       );
     } finally {
       setSubmitting(false);
@@ -195,7 +195,9 @@ const SignUp = () => {
                 name={field}
                 value={values[field]}
                 onChange={change}
-                className="w-full mt-1 p-3 rounded bg-gray-200 dark:bg-zinc-900"
+                className="w-full mt-1 p-3 rounded 
+           bg-gray-200 dark:bg-zinc-900 
+           text-black dark:text-white"
                 aria-invalid={!!formErrors[field]}
                 aria-describedby={
                   formErrors[field] ? `signup-${field}-error` : undefined
@@ -254,7 +256,9 @@ const SignUp = () => {
               name="address"
               value={values.address}
               onChange={change}
-              className="w-full mt-1 p-3 rounded bg-gray-200 dark:bg-zinc-900"
+              className="w-full mt-1 p-3 rounded 
+           bg-gray-200 dark:bg-zinc-900 
+           text-black dark:text-white"
               aria-invalid={!!formErrors.address}
               aria-describedby={
                 formErrors.address ? "signup-address-error" : undefined
