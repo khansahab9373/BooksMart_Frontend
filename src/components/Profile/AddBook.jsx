@@ -1,14 +1,15 @@
-import  { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import Swal from "sweetalert2"; // Import SweetAlert2
+import Swal from "sweetalert2";
 import BaseULR from "../../assets/baseURL";
 
 const AddBook = () => {
-  const [Data, setData] = useState({
+  const [data, setData] = useState({
     url: "",
     title: "",
     author: "",
     price: "",
+    discountPrice: "",
     desc: "",
     language: "",
   });
@@ -18,56 +19,90 @@ const AddBook = () => {
     authorization: `Bearer ${localStorage.getItem("token")}`,
   };
 
-  // Handle input change
   const change = (e) => {
     const { name, value } = e.target;
-    setData({ ...Data, [name]: value });
+    setData({ ...data, [name]: value });
   };
 
-  // Submit function
   const submit = async () => {
     try {
+      /* ===========================
+            BASIC REQUIRED VALIDATION
+      =========================== */
       if (
-        Data.url === "" ||
-        Data.title === "" ||
-        Data.author === "" ||
-        Data.price === "" ||
-        Data.desc === "" ||
-        Data.language === ""
+        !data.url ||
+        !data.title ||
+        !data.author ||
+        !data.price ||
+        !data.desc ||
+        !data.language
       ) {
-        // SweetAlert for missing fields
-        Swal.fire({
+        return Swal.fire({
           icon: "warning",
           title: "Missing Fields",
-          text: "All fields are required!",
-        });
-      } else {
-        const response = await axios.post(`${BaseULR}api/v1/add-book`, Data, {
-          headers,
-        });
-        setData({
-          url: "",
-          title: "",
-          author: "",
-          price: "",
-          desc: "",
-          language: "",
-        });
-        // SweetAlert for success
-        Swal.fire({
-          icon: "success",
-          title: "Book Added",
-          text: response.data.message,
+          text: "All required fields must be filled!",
         });
       }
+
+      const price = Number(data.price);
+      let discountPrice = Number(data.discountPrice);
+
+      if (price <= 0) {
+        return Swal.fire({
+          icon: "error",
+          title: "Invalid Price",
+          text: "Price must be greater than 0",
+        });
+      }
+
+      /* ===========================
+            DISCOUNT VALIDATION
+      =========================== */
+      if (!discountPrice || discountPrice <= 0) {
+        discountPrice = 0; // treat as no discount
+      }
+
+      if (discountPrice >= price) {
+        return Swal.fire({
+          icon: "error",
+          title: "Invalid Discount",
+          text: "Discount price must be less than original price",
+        });
+      }
+
+      await axios.post(
+        `${BaseULR}api/v1/add-book`,
+        {
+          ...data,
+          price,
+          discountPrice,
+        },
+        { headers }
+      );
+
+      setData({
+        url: "",
+        title: "",
+        author: "",
+        price: "",
+        discountPrice: "",
+        desc: "",
+        language: "",
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Book Added Successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (error) {
-      // SweetAlert for error
       Swal.fire({
         icon: "error",
         title: "Error",
         text:
           error.response?.data?.message ||
-          "An error occurred while adding the book.",
+          "Something went wrong while adding the book.",
       });
     }
   };
@@ -78,126 +113,104 @@ const AddBook = () => {
         Add Book
       </h1>
 
-      <div className="p-4 bg-gray-100 dark:bg-zinc-800 rounded-lg text-gray-800 dark:text-zinc-100">
+      <div className="p-6 bg-gray-100 dark:bg-zinc-800 rounded-xl shadow-lg max-w-3xl mx-auto">
+
         {/* Image URL */}
         <div className="mb-4">
-          <label
-            htmlFor="url"
-            className="text-gray-600 dark:text-zinc-400 block mb-2"
-          >
-            Image URL
-          </label>
+          <label className="block mb-2 font-medium">Image URL</label>
           <input
-            id="url"
             type="text"
-            className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-            placeholder="Enter Image URL"
             name="url"
-            value={Data.url}
+            value={data.url}
             onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+            placeholder="Enter Image URL"
           />
         </div>
 
         {/* Title */}
         <div className="mb-4">
-          <label
-            htmlFor="title"
-            className="text-gray-600 dark:text-zinc-400 block mb-2"
-          >
-            Title
-          </label>
+          <label className="block mb-2 font-medium">Title</label>
           <input
-            id="title"
             type="text"
-            className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-            placeholder="Enter Book Title"
             name="title"
-            value={Data.title}
+            value={data.title}
             onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+            placeholder="Enter Book Title"
           />
         </div>
 
         {/* Author */}
         <div className="mb-4">
-          <label
-            htmlFor="author"
-            className="text-gray-600 dark:text-zinc-400 block mb-2"
-          >
-            Author
-          </label>
+          <label className="block mb-2 font-medium">Author</label>
           <input
-            id="author"
             type="text"
-            className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-            placeholder="Enter Author Name"
             name="author"
-            value={Data.author}
+            value={data.author}
             onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+            placeholder="Enter Author Name"
           />
         </div>
 
-        {/* Flex Row: Language & Price */}
-        <div className="flex flex-wrap gap-4 mb-4">
-          <div className="w-full md:w-1/2">
-            <label
-              htmlFor="language"
-              className="text-gray-600 dark:text-zinc-400 block mb-2"
-            >
-              Language
-            </label>
-            <input
-              id="language"
-              type="text"
-              className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-              placeholder="Enter Language"
-              name="language"
-              value={Data.language}
-              onChange={change}
-            />
-          </div>
+        {/* Language */}
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Language</label>
+          <input
+            type="text"
+            name="language"
+            value={data.language}
+            onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+            placeholder="Enter Language"
+          />
+        </div>
 
-          <div className="w-full md:w-1/2">
-            <label
-              htmlFor="price"
-              className="text-gray-600 dark:text-zinc-400 block mb-2"
-            >
-              Price
-            </label>
-            <input
-              id="price"
-              type="number"
-              className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-              placeholder="Enter Price"
-              name="price"
-              value={Data.price}
-              onChange={change}
-            />
-          </div>
+        {/* Price */}
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Price</label>
+          <input
+            type="number"
+            name="price"
+            value={data.price}
+            onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+            placeholder="Enter Price"
+          />
+        </div>
+
+        {/* Discount Price */}
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">
+            Discount Price (Optional)
+          </label>
+          <input
+            type="number"
+            name="discountPrice"
+            value={data.discountPrice}
+            onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+            placeholder="Enter Discount Price"
+          />
         </div>
 
         {/* Description */}
-        <div className="mb-4">
-          <label
-            htmlFor="desc"
-            className="text-gray-600 dark:text-zinc-400 block mb-2"
-          >
-            Description
-          </label>
+        <div className="mb-6">
+          <label className="block mb-2 font-medium">Description</label>
           <textarea
-            id="desc"
-            className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-            rows="5"
-            placeholder="Enter Description"
             name="desc"
-            value={Data.desc}
+            value={data.desc}
             onChange={change}
+            rows="4"
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+            placeholder="Enter Description"
           />
         </div>
 
-        {/* Submit Button */}
         <button
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
           onClick={submit}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
         >
           Add Book
         </button>

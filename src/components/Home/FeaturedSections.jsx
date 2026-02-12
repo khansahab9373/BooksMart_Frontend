@@ -13,11 +13,7 @@ const FeaturedSections = () => {
   }
 
   if (error) {
-    return (
-      <div className="mt-24 text-center text-red-500">
-        {error}
-      </div>
-    );
+    return <div className="mt-24 text-center text-red-500">{error}</div>;
   }
 
   return (
@@ -39,17 +35,27 @@ const FeaturedSections = () => {
         >
           {/* IMAGE (url) */}
           <div className="w-full md:w-1/2 flex justify-center">
-            <img
-              src={book.url}
-              alt={book.title}
-              className="
-                w-64 md:w-72
-                rounded-xl
-                shadow-xl
-                hover:scale-105
-                transition-transform duration-300
-              "
-            />
+            <div className="relative">
+              <img
+                src={book.url}
+                alt={book.title}
+                className="
+        w-64 md:w-72
+        rounded-xl
+        shadow-xl
+        hover:scale-105
+        transition-transform duration-300
+      "
+              />
+
+              {book.discountPrice &&
+                book.discountPrice > 0 &&
+                book.discountPrice < book.price && (
+                  <span className="absolute top-3 right-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold shadow">
+                    SALE
+                  </span>
+                )}
+            </div>
           </div>
 
           {/* CONTENT */}
@@ -70,9 +76,33 @@ const FeaturedSections = () => {
               {book.desc.slice(0, 160)}...
             </p>
 
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">
-              ₹{book.price}
-            </div>
+            {/* PRICE SECTION */}
+            {book.discountPrice &&
+            book.discountPrice > 0 &&
+            book.discountPrice < book.price ? (
+              <div className="space-y-1">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg text-gray-400 line-through">
+                    ₹{book.price}
+                  </span>
+
+                  <span className="text-2xl font-bold text-green-600">
+                    ₹{book.discountPrice}
+                  </span>
+
+                  <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                    {Math.round(
+                      ((book.price - book.discountPrice) / book.price) * 100,
+                    )}
+                    % OFF
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                ₹{book.price}
+              </div>
+            )}
 
             <div className="flex gap-4 justify-center md:justify-start pt-2">
               <Link

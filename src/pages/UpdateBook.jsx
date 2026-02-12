@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2"; // Import SweetAlert2
+import Swal from "sweetalert2";
 import BaseULR from "../assets/baseURL";
 
 const UpdateBook = () => {
@@ -10,6 +10,7 @@ const UpdateBook = () => {
     title: "",
     author: "",
     price: "",
+    discountPrice: "",
     desc: "",
     language: "",
   });
@@ -23,13 +24,11 @@ const UpdateBook = () => {
     bookid: id,
   };
 
-  // Handle input change
   const change = (e) => {
     const { name, value } = e.target;
     setData({ ...Data, [name]: value });
   };
 
-  // Submit function
   const submit = async () => {
     try {
       if (
@@ -40,39 +39,46 @@ const UpdateBook = () => {
         Data.desc === "" ||
         Data.language === ""
       ) {
-        // SweetAlert for missing fields
         Swal.fire({
           icon: "warning",
           title: "Missing Fields",
-          text: "All fields are required!",
+          text: "All required fields must be filled!",
         });
         return;
-      } else {
-        const response = await axios.put(`${BaseULR}api/v1/update-book`, Data, {
-          headers,
-        });
-        setData({
-          url: "",
-          title: "",
-          author: "",
-          price: "",
-          desc: "",
-          language: "",
-        });
-
-        // SweetAlert for success
-        Swal.fire({
-          icon: "success",
-          title: "Book Updated",
-          text: response.data.message,
-        });
-
-        navigate(`/view-book-details/${id}`);
       }
-    } catch (error) {
-      console.error("Error updating book:", error);
 
-      // SweetAlert for error
+      const price = Number(Data.price);
+      const discountPrice = Data.discountPrice
+        ? Number(Data.discountPrice)
+        : 0;
+
+      if (discountPrice > price) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Discount",
+          text: "Discount price cannot be greater than original price!",
+        });
+        return;
+      }
+
+      const response = await axios.put(
+        `${BaseULR}api/v1/update-book`,
+        {
+          ...Data,
+          price,
+          discountPrice,
+        },
+        { headers },
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Book Updated",
+        text: response.data.message,
+      });
+
+      navigate(`/view-book-details/${id}`);
+    } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -87,13 +93,14 @@ const UpdateBook = () => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          `${BaseULR}api/v1/get-book-by-id/${id}`
+          `${BaseULR}api/v1/get-book-by-id/${id}`,
         );
-        setData(response.data.data);
-      } catch (error) {
-        console.error("Error fetching book details:", error);
 
-        // SweetAlert for error
+        setData({
+          ...response.data.data,
+          discountPrice: response.data.data.discountPrice || "",
+        });
+      } catch (error) {
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -106,130 +113,101 @@ const UpdateBook = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white px-4 py-8">
-      <h1 className="text-3xl md:text-5xl font-semibold text-gray-800 dark:text-yellow-100 mb-8">
+      <h1 className="text-3xl md:text-5xl font-semibold mb-8">
         Update Book
       </h1>
 
-      <div className="p-4 bg-gray-100 dark:bg-zinc-800 rounded-lg text-gray-800 dark:text-zinc-100">
+      <div className="p-4 bg-gray-100 dark:bg-zinc-800 rounded-lg">
+
         {/* Image URL */}
         <div className="mb-4">
-          <label
-            htmlFor="url"
-            className="text-gray-600 dark:text-zinc-400 block mb-2"
-          >
-            Image URL
-          </label>
+          <label className="block mb-2">Image URL</label>
           <input
-            id="url"
             type="text"
-            className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-            placeholder="Enter Image URL"
             name="url"
             value={Data.url}
             onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
           />
         </div>
 
         {/* Title */}
         <div className="mb-4">
-          <label
-            htmlFor="title"
-            className="text-gray-600 dark:text-zinc-400 block mb-2"
-          >
-            Title
-          </label>
+          <label className="block mb-2">Title</label>
           <input
-            id="title"
             type="text"
-            className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-            placeholder="Enter Book Title"
             name="title"
             value={Data.title}
             onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
           />
         </div>
 
         {/* Author */}
         <div className="mb-4">
-          <label
-            htmlFor="author"
-            className="text-gray-600 dark:text-zinc-400 block mb-2"
-          >
-            Author
-          </label>
+          <label className="block mb-2">Author</label>
           <input
-            id="author"
             type="text"
-            className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-            placeholder="Enter Author Name"
             name="author"
             value={Data.author}
             onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
           />
         </div>
 
-        {/* Flex Row: Language & Price */}
-        <div className="flex flex-wrap gap-4 mb-4">
-          <div className="w-full md:w-1/2">
-            <label
-              htmlFor="language"
-              className="text-gray-600 dark:text-zinc-400 block mb-2"
-            >
-              Language
-            </label>
-            <input
-              id="language"
-              type="text"
-              className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-              placeholder="Enter Language"
-              name="language"
-              value={Data.language}
-              onChange={change}
-            />
-          </div>
+        {/* Language */}
+        <div className="mb-4">
+          <label className="block mb-2">Language</label>
+          <input
+            type="text"
+            name="language"
+            value={Data.language}
+            onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+          />
+        </div>
 
-          <div className="w-full md:w-1/2">
-            <label
-              htmlFor="price"
-              className="text-gray-600 dark:text-zinc-400 block mb-2"
-            >
-              Price
-            </label>
-            <input
-              id="price"
-              type="number"
-              className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-              placeholder="Enter Price"
-              name="price"
-              value={Data.price}
-              onChange={change}
-            />
-          </div>
+        {/* Price */}
+        <div className="mb-4">
+          <label className="block mb-2">Price</label>
+          <input
+            type="number"
+            name="price"
+            value={Data.price}
+            onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+          />
+        </div>
+
+        {/* 🔥 Fixed Discount Price */}
+        <div className="mb-4">
+          <label className="block mb-2">
+            Discount Price (Optional)
+          </label>
+          <input
+            type="number"
+            name="discountPrice"
+            value={Data.discountPrice}
+            onChange={change}
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
+          />
         </div>
 
         {/* Description */}
         <div className="mb-4">
-          <label
-            htmlFor="desc"
-            className="text-gray-600 dark:text-zinc-400 block mb-2"
-          >
-            Description
-          </label>
+          <label className="block mb-2">Description</label>
           <textarea
-            id="desc"
-            className="w-full bg-gray-200 dark:bg-zinc-900 text-black dark:text-zinc-100 p-2 outline-none rounded"
-            rows="5"
-            placeholder="Enter Description"
             name="desc"
             value={Data.desc}
             onChange={change}
+            rows="4"
+            className="w-full p-2 rounded bg-gray-200 dark:bg-zinc-900"
           />
         </div>
 
-        {/* Submit Button */}
         <button
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
           onClick={submit}
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
         >
           Update Book
         </button>
